@@ -40,8 +40,14 @@ int main(int argc, char* argv[]) {
      edges[i] = p;
    } 
 
-   // Print out the results
+   // Print out the number of nodes in the graph
+   cout << n << endl;
+
+   // Print out the number of edges in the graph
    int e = ceil ( d * num_edges );
+   cout << e << endl;
+
+   // Print out the results
    for (int i = 0; i < n; i++) {
      cout << i;
      for (int j = 0; j < e; j++) {
