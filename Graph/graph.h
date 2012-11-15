@@ -1,7 +1,10 @@
+
+
 #ifndef GRAPH_H
 #define GRAPH_H
-
-  using namespace std;
+#include <iostream> 
+#include <vector>
+using namespace std;
 
   class Graph {
 
@@ -12,13 +15,13 @@
 
     // Return an iterator that will iteratates all the neighbours of a
     // we could discuss more about this and come to agreement if you find this setup doesn't work
-    virtual iterator neighbours(int a) = 0;
+    virtual vector<int> neighbours(int a) = 0;
 
     // Add an edge between a and b
     virtual void addNeighbour(int a, int b) = 0;
 
     // Remove an edge between a and b
     virtual bool removeNeighbour(int a, int b) = 0;
-  }
+  };
 
-#ENDIF
+#endif
