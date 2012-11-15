@@ -8,18 +8,22 @@
 
   class Algorithm {
 
-   private:
+   protected:
 
     // Store the colours in an array
     int* colours;
-
+    Graph* g;
+    
    public:
+
+    // Constructor
+    Algorithm (int num_nodes, Graph* g);
 
     // Print out the results
     void printResults();
 
     // Colour the graph G
-    virtual void addNeighbour(Graph g) = 0;
+    virtual void colourGraph() = 0;
   }
 
 #ENDIF
