@@ -26,4 +26,4 @@
     virtual void colourGraph() = 0;
   }
 
-#ENDIF
+#endif
