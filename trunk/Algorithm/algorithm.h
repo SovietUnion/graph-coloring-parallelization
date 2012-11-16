@@ -1,8 +1,6 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
-  #include <fstream>
-  #include "../Graph/graph.h"
 
   using namespace std;
 
@@ -24,6 +22,6 @@
 
     // Colour the graph G
     virtual void colourGraph() = 0;
-  }
+  };
 
 #endif
