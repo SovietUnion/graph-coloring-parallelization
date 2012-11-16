@@ -1,4 +1,4 @@
-MatrixGraph.o: graph.h MatrixGraph.h
+MatrixGraph.o: Graph.h MatrixGraph.h
 	g++ -c MatrixGraph.cpp
 clean: 
-	rm *.o
+	rm *.o matrixgraph
