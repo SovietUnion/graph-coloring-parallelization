@@ -2,15 +2,15 @@
 
 using namespace std;
 
-MatrixGraph::MatrixGraph(int mSize) {
+MatrixGraph::MatrixGraph(unsigned int mSize) {
     if (mSize <= 0) {
 	throw "Matrix size needs to be greater than 1.\n";
     }
     size = mSize; 
-    graph.resize(size, vector<int>(size, 0));
+    graph.resize(size, vector<bool>(size, 0));
 }
 
-MatrixGraph::MatrixGraph(vector<vector<int> > g, int mSize) {
+MatrixGraph::MatrixGraph(const vector<vector<bool> > &g, unsigned int mSize) {
     if (mSize <= 0) {
 	throw "Matrix size needs to be greater than 1.\n";
     }
@@ -26,9 +26,9 @@ MatrixGraph::isNeighbours(int a, int b) {
     return (graph[a][b] == 1 && graph[b][a] == 1);
 }
 
-vector<int>
+vector<unsigned int>
 MatrixGraph::neighbours(int a) {
-    vector<int> neighbours;
+    vector<unsigned int> neighbours;
     for (int i = 0; i < size; i++) {
 	if (graph[a][i] == 1) {
            neighbours.push_back(i);
@@ -65,9 +65,9 @@ ostream& operator<<(ostream &os, const MatrixGraph &g){
 // The following codes are for testing purpose, to be removed later
 /* code to test if matrix graph works 
 int main(int argc, char* argv[]) {
-   int gSize = 4;
-   vector<vector<int> > testMatrix;
-   testMatrix.resize(gSize, vector<int>(gSize, 0));
+   unsigned int gSize = 4;
+   vector<vector<bool> > testMatrix;
+   testMatrix.resize(gSize, vector<bool>(gSize, 0));
    //initialize adjacency matrix graph
    MatrixGraph graph(testMatrix, gSize);
 
@@ -84,8 +84,8 @@ int main(int argc, char* argv[]) {
    cout<<graph;
 
    // print out neighbour of node 1
-   vector<int> neighbours = graph.neighbours(1);
-   vector<int>::iterator it;
+   vector<unsigned int> neighbours = graph.neighbours(1);
+   vector<unsigned int>::iterator it;
    cout<<"node 1's neighbours: ";
    for (it=neighbours.begin(); it < neighbours.end(); it++)
        cout << " " << *it;

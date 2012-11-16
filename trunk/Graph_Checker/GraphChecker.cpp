@@ -2,7 +2,7 @@
 #include <fstream> 
 #include <sstream> 
 #include <stdlib.h>
-#include "../Graph/graph.h"
+#include "../Graph/Graph.h"
 #include "../Graph/MatrixGraph.h"
 #include "GraphChecker.h"
 
@@ -11,7 +11,7 @@ using namespace std;
 // Check if Graph g with colouring scheme c is valid or not
 bool GraphChecker::checkGraph(Graph* g, int* c, const int n) {
 
-  vector<int> neigh;
+  vector<unsigned int> neigh;
 
   // go through all nodes and their neighbours to make sure no 2 neigbhours' colours are the same
   for ( int i = 0; i < n; i++ ) {

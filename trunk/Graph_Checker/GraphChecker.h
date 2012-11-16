@@ -1,6 +1,6 @@
 #ifndef GRAPHCHECKER_H
 #define GRAPHCHECKER_H
-#include "../Graph/graph.h"
+#include "../Graph/Graph.h"
 
 class GraphChecker {
 
