@@ -61,7 +61,9 @@ ostream& operator<<(ostream &os, const MatrixGraph &g){
 	return os;
 }
 
-/* code to test if matrix graph works */
+
+// The following codes are for testing purpose, to be removed later
+/* code to test if matrix graph works 
 int main(int argc, char* argv[]) {
    int gSize = 4;
    vector<vector<int> > testMatrix;
@@ -90,4 +92,5 @@ int main(int argc, char* argv[]) {
    cout<<endl;
 
    return 0;
-}
+}*/
+
