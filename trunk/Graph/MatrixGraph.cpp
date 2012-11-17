@@ -26,15 +26,13 @@ MatrixGraph::isNeighbours(int a, int b) {
     return (graph[a][b] == 1 && graph[b][a] == 1);
 }
 
-vector<unsigned int>
-MatrixGraph::neighbours(int a) {
-    vector<unsigned int> neighbours;
+void
+MatrixGraph::neighbours(int a, vector<unsigned int> &neighbours) {
     for (int i = 0; i < size; i++) {
 	if (graph[a][i] == 1) {
            neighbours.push_back(i);
         }
      }	    
-    return neighbours;
 }
 
 void
@@ -64,6 +62,7 @@ ostream& operator<<(ostream &os, const MatrixGraph &g){
 
 // The following codes are for testing purpose, to be removed later
 /* code to test if matrix graph works 
+
 int main(int argc, char* argv[]) {
    unsigned int gSize = 4;
    vector<vector<bool> > testMatrix;
@@ -84,7 +83,8 @@ int main(int argc, char* argv[]) {
    cout<<graph;
 
    // print out neighbour of node 1
-   vector<unsigned int> neighbours = graph.neighbours(1);
+   vector<unsigned int> neighbours;
+   graph.neighbours(1, neighbours);
    vector<unsigned int>::iterator it;
    cout<<"node 1's neighbours: ";
    for (it=neighbours.begin(); it < neighbours.end(); it++)
@@ -93,4 +93,3 @@ int main(int argc, char* argv[]) {
 
    return 0;
 }*/
-

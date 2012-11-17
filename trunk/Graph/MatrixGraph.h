@@ -17,7 +17,7 @@ class MatrixGraph: public Graph {
 
     // Return an iterator that will iteratates all the neighbours of a
     // we could discuss more about this and come to agreement if you find this setup doesn't work
-    virtual vector<unsigned int> neighbours(int a);
+    virtual void neighbours(int a, vector<unsigned int> &neighbours);
 
     // Add an edge between a and b
     virtual void addNeighbour(int a, int b);
