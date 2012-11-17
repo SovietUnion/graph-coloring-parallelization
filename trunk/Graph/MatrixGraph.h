@@ -19,11 +19,23 @@ class MatrixGraph: public Graph {
     // we could discuss more about this and come to agreement if you find this setup doesn't work
     virtual void neighbours(int a, vector<unsigned int> &neighbours);
 
+    // Return a set of non-neighbours
+    virtual void nonNeighbours(int a, vector<unsigned int> &nonNeighbours);
+
     // Add an edge between a and b
     virtual void addNeighbour(int a, int b);
 
     // Remove an edge between a and b
     virtual bool removeNeighbour(int a, int b);
+
+    // Number of the common neighbours for a and b
+    virtual int getCommonNeighboursCount(int a, int b);
+
+    // Get the vertex degree
+    virtual int getDegree(int vertex);
+
+    // Get the vertex with Maximal degree
+    virtual int getMaxDegreeVertex();
 
     // format ostream output to printout the graph matrix
     friend std::ostream& operator<<(ostream &os, const MatrixGraph &g);
