@@ -15,7 +15,7 @@ bool GraphChecker::checkGraph(Graph* g, int* c, const int n) {
 
   // go through all nodes and their neighbours to make sure no 2 neigbhours' colours are the same
   for ( int i = 0; i < n; i++ ) {
-    neigh = g->neighbours(i);
+    g->neighbours(i,neigh);
     for (int j = 0; j < neigh.size(); j++) {
       if (c[i] == c[neigh[j]]) {
        cout << "Node " << i << " and Node " << neigh[j] << "both are colour " << c[i] << endl;
