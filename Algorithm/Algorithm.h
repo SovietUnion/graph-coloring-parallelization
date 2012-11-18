@@ -1,28 +1,21 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
+#include "../Graph/Graph.h"
+#include "../Graph/MatrixGraph.h"
 
+using namespace std;
 
-  using namespace std;
+class Algorithm {
+protected:
+    Graph* g_;
 
-  class Algorithm {
-
-   protected:
-
-    // Store the colours in an array
-    int* colours;
-    int num_of_nodes;
-    Graph* g;
-    
-   public:
-
-    // Constructor
-    Algorithm (int num_nodes, Graph* g);
+public:
 
     // Print out the results
-    void printResults();
+    virtual void printResults() = 0;
 
-    // Colour the graph G
-    virtual void colourGraph() = 0;
-  };
+    // Colour the graph G and return number of colours used
+    virtual int colourGraph() = 0;
+};
 
 #endif
