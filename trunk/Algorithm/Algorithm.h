@@ -10,6 +10,7 @@
 
     // Store the colours in an array
     int* colours;
+    int num_of_nodes;
     Graph* g;
     
    public:
