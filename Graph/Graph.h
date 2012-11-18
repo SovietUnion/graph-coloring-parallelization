@@ -8,7 +8,7 @@ using namespace std;
 
 class Graph {
 protected:
-    vector<unsigned int> colours_;
+   unsigned int * colours_;
 
 public:
     // Return true if a and b are neighbours
@@ -49,7 +49,7 @@ public:
     virtual void setColour(int v, int colour) = 0;
 
     // get colors of graph
-    virtual vector<unsigned int> getColours() = 0;
+    virtual unsigned int* getColours() = 0;
 
 
 };

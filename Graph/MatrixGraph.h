@@ -48,7 +48,7 @@ class MatrixGraph: public Graph {
     virtual void setColour(int v, int colour);
 
     // get colors of graph
-    virtual vector<unsigned int> getColours();
+    virtual unsigned int* getColours();
 
     // format ostream output to printout the graph matrix
     friend std::ostream& operator<<(ostream &os, const MatrixGraph &g);
