@@ -9,11 +9,10 @@ ContractAlgorithm::ContractAlgorithm(Graph* g) {
 // Print out the results
 void
 ContractAlgorithm::printResults() {
-    vector<unsigned int> color = g_->getColours();
+    unsigned int *colour = g_->getColours();
     for (int i = 0; i < g_->getSize(); i++) {
-        cout << "vertex " << i << " colour: " << (color[i]) << endl;
+        cout << "vertex " << i << " colour: " << (colour[i]) << endl;
     }
-    color.clear();
 }
 
 int

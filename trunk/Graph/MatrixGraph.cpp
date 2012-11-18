@@ -9,7 +9,7 @@ MatrixGraph::MatrixGraph(unsigned int mSize) {
     }
     size = mSize;
     graph.resize(size, vector<bool>(size, 0));
-    colours_.resize(size);
+    colours_ = new unsigned int[mSize];
 }
 
 MatrixGraph::MatrixGraph(const vector<vector<bool> > &g, unsigned int mSize) {
@@ -18,7 +18,7 @@ MatrixGraph::MatrixGraph(const vector<vector<bool> > &g, unsigned int mSize) {
     }
     size = mSize;
     graph = g;
-    colours_.resize(size);
+    colours_ = new unsigned int[mSize];
 }
 
 bool
@@ -135,7 +135,7 @@ MatrixGraph::setColour(int v, int colour) {
     colours_[v] = colour;
 }
 
-vector<unsigned int> 
+unsigned int *
 MatrixGraph::getColours() {
 
     return colours_;
