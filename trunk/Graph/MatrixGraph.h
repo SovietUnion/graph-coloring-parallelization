@@ -5,9 +5,7 @@
 
 class MatrixGraph: public Graph {
 
-
    public:
-
     // Constructor that generates a 2d graph
     MatrixGraph(unsigned int mSize);
     // Constructor that take in a pregenerated graph
@@ -36,6 +34,21 @@ class MatrixGraph: public Graph {
 
     // Get the vertex with Maximal degree
     virtual int getMaxDegreeVertex();
+    
+    // Get the vertext with Maximal degree of a particular set
+    virtual int getMaxDegreeVertex(vector<unsigned int> & nn);
+    
+    // Get the vertex count in G
+    virtual unsigned int getSize();
+
+    // Contract a into b;
+    virtual void contract(int a, int b);
+
+    // Set color for a vertex
+    virtual void setColour(int v, int colour);
+
+    // get colors of graph
+    virtual vector<unsigned int> getColours();
 
     // format ostream output to printout the graph matrix
     friend std::ostream& operator<<(ostream &os, const MatrixGraph &g);

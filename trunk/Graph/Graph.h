@@ -1,5 +1,4 @@
 
-
 #ifndef GRAPH_H
 #define GRAPH_H
 #include <iostream> 
@@ -7,10 +6,11 @@
 
 using namespace std;
 
-  class Graph {
+class Graph {
+protected:
+    vector<unsigned int> colours_;
 
-   public:
-
+public:
     // Return true if a and b are neighbours
     virtual bool isNeighbours(int a, int b) = 0;
 
@@ -30,12 +30,28 @@ using namespace std;
     // Number of the common neighbours for a and b
     virtual int getCommonNeighboursCount(int a, int b) = 0;
 
+    // Get the vertext with Maximal degree of a particular set
+    virtual int getMaxDegreeVertex(vector<unsigned int> & nn) = 0;
+
     // Get the vertex degree
     virtual int getDegree(int vertex) = 0;
 
     // Get the vertex with Maximal degree
     virtual int getMaxDegreeVertex() = 0;
 
-  };
+    // Get the vertex count in G
+    virtual unsigned int getSize() = 0;
+
+    // Contract a into b;
+    virtual void contract(int a, int b) = 0;
+
+    // Set color for a vertex
+    virtual void setColour(int v, int colour) = 0;
+
+    // get colors of graph
+    virtual vector<unsigned int> getColours() = 0;
+
+
+};
 
 #endif
