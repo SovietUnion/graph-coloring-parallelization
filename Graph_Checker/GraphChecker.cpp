@@ -22,12 +22,12 @@ bool GraphChecker::checkGraph(Graph* g, int* c, const int n) {
        return false;
       }
     }
+    neigh.clear();
   } 
 
   return true;
 
 }
-
 
 // Takes in 2 inputs
 // First input (n, an integer) specifies the number of nodes
@@ -95,10 +95,12 @@ int main(int argc, char* argv[]) {
 
    if (!GraphChecker::checkGraph(g,c,numNodes)) {
       delete g;
+      cout << "FAIL" << endl;
       return 1;
    }
 
    delete g;
  
+   cout << "PASS" << endl;
    return 0; 
 }
