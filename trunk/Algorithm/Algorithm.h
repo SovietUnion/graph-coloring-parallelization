@@ -12,7 +12,7 @@ protected:
 public:
 
     // Print out the results
-    virtual void printResults() = 0;
+    void printResults();
 
     // Colour the graph G and return number of colours used
     virtual int colourGraph() = 0;
