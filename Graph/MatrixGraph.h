@@ -1,4 +1,3 @@
-
 #ifndef MATRIXGRAPH_H
 #define MATRIXGRAPH_H
 #include "Graph.h"
@@ -52,7 +51,34 @@ class MatrixGraph: public Graph {
 
     // format ostream output to printout the graph matrix
     friend std::ostream& operator<<(ostream &os, const MatrixGraph &g);
-
+    
+    ============================================================
+    following are some extra functions used for BSC(may be still open to revise)
+    //Get all the degrees
+    virtual void getAllDegree(vector<unsigned int> &A,vector<unsigned int> &AllDegree);
+    
+    //Sort the vertices according to non-increasing degrees
+    virtual void SortbyDegree(vector<unsigned int> &A,vector<unsigned int> &AllDegree);
+    
+    //Get the set of free colors, which used but not present in neighbor of x
+    virtual void getFreeColors(int x,vector<unsigned int> &U);
+    
+    //Get the number of used color
+    virtual int getUsedColorNum(int i);
+    
+    //Remove color k
+    virtual void removeColor(unsigned int k,vector<unsigned int> &U );
+    
+    //Sort the set of color(U) according to non-decreasing order
+    virtual void sortU(vector<unsigned int> &U);
+    
+    //Uncolor a vertex
+    virtual void unColour(int v);
+    
+    //Get the color of vertex with index x
+    virtual unsigned int getColor(unsigned int x);
+                                                ---edited by Yao
+    =============================================================
     private: 
 	unsigned int size;
 	vector<vector<bool> > graph;
