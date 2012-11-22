@@ -52,8 +52,15 @@ public:
     virtual void resetColours() = 0;
     // get colors of graph
     virtual unsigned int* getColours() = 0;
+    
+    // helper function to override ostream to work in subclass
+    virtual ostream& print(ostream &os) const = 0;
 
-
+    // override default ostream so cout<<object can be achieved
+    friend ostream& operator<<(ostream &os, const Graph &g) {
+       g.print(os);
+       return os;
+    }
 };
 
 #endif

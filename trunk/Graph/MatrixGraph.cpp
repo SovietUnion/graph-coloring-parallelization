@@ -148,13 +148,18 @@ MatrixGraph::resetColours() {
     }
 }
 
-ostream& operator<<(ostream &os, const MatrixGraph &g) {
-    for (int i = 0; i < g.size; i++) {
-        for (int j = 0; j < g.size; j++) {
-            os << g.graph[i][j] << " ";
+
+ostream& 
+MatrixGraph::print(ostream &os) const
+{
+    os<<size<<" by "<<size<<" Graph:"<<endl;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            os << graph[i][j] << " ";
         }
         os << endl;
     }
     return os;
 }
+
 
