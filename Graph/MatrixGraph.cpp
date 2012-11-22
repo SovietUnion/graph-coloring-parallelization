@@ -140,6 +140,14 @@ MatrixGraph::getColours() {
     return colours_;
 }
 
+void 
+MatrixGraph::resetColours() {
+    for (int i = 0; i < size; i++)
+    {
+        colours_[i] = 0;
+    }
+}
+
 ostream& operator<<(ostream &os, const MatrixGraph &g) {
     for (int i = 0; i < g.size; i++) {
         for (int j = 0; j < g.size; j++) {

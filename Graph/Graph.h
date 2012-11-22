@@ -48,6 +48,8 @@ public:
     // Set color for a vertex
     virtual void setColour(int v, int colour) = 0;
 
+    // reset colors;
+    virtual void resetColours() = 0;
     // get colors of graph
     virtual unsigned int* getColours() = 0;
 
