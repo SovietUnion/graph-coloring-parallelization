@@ -13,7 +13,6 @@ Algorithm::Algorithm (int num_nodes, Graph* g) {
 }
 
 Algorithm::~Algorithm {
-
   delete [] colours;
 }
 

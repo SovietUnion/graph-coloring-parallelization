@@ -4,6 +4,8 @@ using namespace std;
 
 ContractAlgorithm::ContractAlgorithm(Graph* g) {
     g_ = g;
+    // reset colours array
+    g_->resetColours();
 }
 
 // Print out the results
@@ -59,6 +61,8 @@ ContractAlgorithm::colourGraph() {
         }
         size--;
     }
+    // clear memory
+    
     return colournumber;
 }
 

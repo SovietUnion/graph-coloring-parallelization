@@ -48,6 +48,9 @@ class MatrixGraph: public Graph {
 
     // get colors of graph
     virtual unsigned int* getColours();
+    
+    // reset colors;
+    virtual void resetColours();
 
     // format ostream output to printout the graph matrix
     friend std::ostream& operator<<(ostream &os, const MatrixGraph &g);

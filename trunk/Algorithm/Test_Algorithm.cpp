@@ -31,11 +31,70 @@ int main(int argc, char* argv[]) {
     g->addNeighbour(3, 5);
     g->addNeighbour(3, 6);
     g->addNeighbour(4, 6);
-
 	
     Algorithm *a = new ContractAlgorithm(g);
     //run algorithm
     cout << "number of color: " << a->colourGraph() << endl;
     a->printResults();
+    cout<<endl;
+     
+    delete a;
+    delete g;
+
+    g = new MatrixGraph(testMatrix, gSize);
+    // Make it complete graph K7,7
+    g->addNeighbour(0, 3);
+    g->addNeighbour(0, 6);
+    g->addNeighbour(1, 2);
+    g->addNeighbour(1, 4);
+    g->addNeighbour(2, 6);
+    g->addNeighbour(3, 4);
+    g->addNeighbour(4, 5);
+    g->addNeighbour(0, 1);
+    g->addNeighbour(0, 2);
+    g->addNeighbour(0, 4);
+    g->addNeighbour(0, 5);
+    g->addNeighbour(1, 3);
+    g->addNeighbour(1, 5);
+    g->addNeighbour(1, 6);
+    g->addNeighbour(2, 3);
+    g->addNeighbour(2, 4);
+    g->addNeighbour(2, 5);
+    g->addNeighbour(3, 5);
+    g->addNeighbour(3, 6);
+    g->addNeighbour(4, 6);
+    g->addNeighbour(5, 6);
+    a = new ContractAlgorithm(g);
+    //run algorithm
+    cout << "number of color: " << a->colourGraph() << endl;
+    a->printResults();
+    cout<<endl;
+    delete a;
+    delete g;
+
+   /*
+      0 1
+    0 0 1 
+    1 1 0
+     */
+    g = new MatrixGraph(testMatrix, 2);
+    g->addNeighbour(0, 1);
+    a = new ContractAlgorithm(g);
+    //run algorithm
+    cout << "number of color: " << a->colourGraph() << endl;
+    a->printResults();
+    cout<<endl;
+
+    /*
+      0 1
+    0 0 0 
+    1 0 0
+     */
+    g->removeNeighbour(0, 1);
+    delete a;
+    a = new ContractAlgorithm(g);
+    //run algorithm
+    cout << "number of color: " << a->colourGraph() << endl;
+    a->printResults();   
 
 }
