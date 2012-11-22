@@ -53,8 +53,7 @@ class MatrixGraph: public Graph {
     virtual void resetColours();
 
     // format ostream output to printout the graph matrix
-    friend std::ostream& operator<<(ostream &os, const MatrixGraph &g);
-    
+    virtual ostream& print(ostream &os) const;
     private: 
 	unsigned int size;
 	vector<vector<bool> > graph;

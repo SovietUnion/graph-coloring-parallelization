@@ -33,6 +33,8 @@ int main(int argc, char* argv[]) {
     g->addNeighbour(4, 6);
 	
     Algorithm *a = new ContractAlgorithm(g);
+    //print out the graph matrix
+    cout<<*g;
     //run algorithm
     cout << "number of color: " << a->colourGraph() << endl;
     a->printResults();
@@ -65,6 +67,9 @@ int main(int argc, char* argv[]) {
     g->addNeighbour(4, 6);
     g->addNeighbour(5, 6);
     a = new ContractAlgorithm(g);
+
+    //print out the graph matrix
+    cout<<*g;
     //run algorithm
     cout << "number of color: " << a->colourGraph() << endl;
     a->printResults();
@@ -72,13 +77,10 @@ int main(int argc, char* argv[]) {
     delete a;
     delete g;
 
-   /*
-      0 1
-    0 0 1 
-    1 1 0
-     */
     g = new MatrixGraph(testMatrix, 2);
     g->addNeighbour(0, 1);
+    //print out the graph matrix
+    cout<<*g;
     a = new ContractAlgorithm(g);
     //run algorithm
     cout << "number of color: " << a->colourGraph() << endl;
@@ -93,8 +95,12 @@ int main(int argc, char* argv[]) {
     g->removeNeighbour(0, 1);
     delete a;
     a = new ContractAlgorithm(g);
+
+    //print out the graph matrix
+    cout<<*g;
     //run algorithm
     cout << "number of color: " << a->colourGraph() << endl;
-    a->printResults();   
+    a->printResults();
+   
 
 }
