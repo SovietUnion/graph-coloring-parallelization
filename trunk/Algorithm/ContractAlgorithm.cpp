@@ -2,10 +2,11 @@
 
 using namespace std;
 
-ContractAlgorithm::ContractAlgorithm(Graph* g) {
+ContractAlgorithm::ContractAlgorithm(Graph* g, int threadcount) {
     g_ = g;
     // reset colours array
     g_->resetColours();
+    threadcount_=threadcount;
 }
 
 // Print out the results
@@ -17,8 +18,11 @@ ContractAlgorithm::printResults() {
     }
 }
 
+
+//**** NEED TO MODIFY THE GRAPH TO TAKE SLICE & THREAD INTO ACCOUNT
 int
-ContractAlgorithm::colourGraph() {
+ContractAlgorithm::colourGraph(int slice) {
+    cout<<slice<<endl;
     int colournumber = 0;
     int size = g_->getSize();
     while (size > 0) {
@@ -61,7 +65,7 @@ ContractAlgorithm::colourGraph() {
         }
         size--;
     }
-    
     return colournumber;
 }
+
 
