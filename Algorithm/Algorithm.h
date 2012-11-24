@@ -8,6 +8,7 @@ using namespace std;
 class Algorithm {
 protected:
     Graph* g_;
+    int threadcount_;
 
 public:
 
@@ -15,7 +16,8 @@ public:
     virtual void printResults() = 0;
 
     // Colour the graph G and return number of colours used
-    virtual int colourGraph() = 0;
+    virtual int colourGraph(int slice) = 0;
+    
 };
 
 #endif
