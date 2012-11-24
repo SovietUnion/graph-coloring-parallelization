@@ -61,7 +61,6 @@ ContractAlgorithm::colourGraph() {
         }
         size--;
     }
-    // clear memory
     
     return colournumber;
 }

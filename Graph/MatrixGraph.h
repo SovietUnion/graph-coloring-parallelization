@@ -55,7 +55,7 @@ class MatrixGraph: public Graph {
     // format ostream output to printout the graph matrix
     virtual ostream& print(ostream &os) const;
     private: 
-	unsigned int size;
+	unsigned int size;	
 	vector<vector<bool> > graph;
 
 };

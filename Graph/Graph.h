@@ -9,6 +9,7 @@ using namespace std;
 class Graph {
 protected:
    unsigned int * colours_;
+   unsigned int * degrees_;
 
 public:
     // Return true if a and b are neighbours
