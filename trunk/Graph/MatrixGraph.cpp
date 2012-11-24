@@ -9,6 +9,7 @@ MatrixGraph::MatrixGraph(unsigned int mSize) {
     size = mSize;
     graph.resize(size, vector<bool>(size, 0));
     colours_ = new unsigned int[mSize];
+    degrees_ = new unsigned int[mSize];
 }
 
 MatrixGraph::MatrixGraph(const vector<vector<bool> > &g, unsigned int mSize) {
@@ -18,6 +19,7 @@ MatrixGraph::MatrixGraph(const vector<vector<bool> > &g, unsigned int mSize) {
     size = mSize;
     graph = g;
     colours_ = new unsigned int[mSize];
+    degrees_ = new unsigned int[mSize];
 }
 
 bool
@@ -30,9 +32,12 @@ MatrixGraph::isNeighbours(int a, int b) {
 
 void
 MatrixGraph::neighbours(int a, vector<unsigned int> &neighbours) {
-    for (int i = 0; i < size; i++) {
-        if (graph[a][i] == 1) {
-            neighbours.push_back(i);
+    // Only find neighbours if vertex has positive degree
+    if (degrees_[a] > 0) {
+        for (int i = 0; i < size; i++) {
+	    if (graph[a][i] == 1) {
+	    neighbours.push_back(i);
+	    }
         }
     }
 }
@@ -49,6 +54,8 @@ MatrixGraph::nonNeighbours(int a, vector<unsigned int> &nonNeighbours) {
 void
 MatrixGraph::addNeighbour(int a, int b) {
     graph[a][b] = graph[b][a] = 1;
+    degrees_[a]++;
+    degrees_[b]++;
 }
 
 bool
@@ -57,6 +64,8 @@ MatrixGraph::removeNeighbour(int a, int b) {
         return false;
     }
     graph[a][b] = graph[b][a] = 0;
+    degrees_[a]--;
+    degrees_[b]--;
     return true;
 }
 
@@ -73,13 +82,7 @@ MatrixGraph::getCommonNeighboursCount(int a, int b) {
 
 int
 MatrixGraph::getDegree(int vertex) {
-    int count = 0;
-    for (int i = 0; i < size; i++) {
-        if (graph[vertex][i] == 1) {
-            count++;
-        }
-    }
-    return count;
+    return degrees_[vertex];
 }
 
 unsigned int
@@ -93,7 +96,7 @@ MatrixGraph::getMaxDegreeVertex() {
     int maxVertex = 0;
     int tempDegree = 0;
     for (int i = 0; i < size; i++) {
-        if (colours_[i] == 0 && (tempDegree = getDegree(i)) > maxDegree) {
+        if (colours_[i] == 0 && (tempDegree = degrees_[i]) > maxDegree) {
             maxDegree = tempDegree;
             maxVertex = i;
         }
@@ -110,7 +113,7 @@ MatrixGraph::getMaxDegreeVertex(vector<unsigned int> & nn) {
 
     vector<unsigned int>::iterator it;
     for (it = nn.begin(); it < nn.end(); it++) {
-        if (colours_[*it] == 0 && (tempDegree = getDegree(*it)) > maxDegree) {
+        if (colours_[*it] == 0 && (tempDegree = degrees_[*it]) > maxDegree) {
             maxDegree = tempDegree;
             maxVertex = *it;
         }
@@ -121,10 +124,13 @@ MatrixGraph::getMaxDegreeVertex(vector<unsigned int> & nn) {
 
 void 
 MatrixGraph::contract(int a, int b) {
+    // Grab all b's edges and contract into a
     for (int i = 0; i < size; i++) {
         if (graph[b][i] == 1) {
             graph[a][i] = graph[i][a] = 1;
             graph[b][i] = graph[i][b] = 0;
+	    degrees_[a]++;
+	    degrees_[b]--;
         }
     }
 }
@@ -136,7 +142,6 @@ MatrixGraph::setColour(int v, int colour) {
 
 unsigned int *
 MatrixGraph::getColours() {
-
     return colours_;
 }
 
