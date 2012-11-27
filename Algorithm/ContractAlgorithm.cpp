@@ -18,11 +18,9 @@ ContractAlgorithm::printResults() {
     }
 }
 
-
-//**** NEED TO MODIFY THE GRAPH TO TAKE SLICE & THREAD INTO ACCOUNT
 int
-ContractAlgorithm::colourGraph(int slice) {
-    cout<<slice<<endl;
+ContractAlgorithm::colourGraph() {
+
     int colournumber = 0;
     int size = g_->getSize();
     while (size > 0) {
