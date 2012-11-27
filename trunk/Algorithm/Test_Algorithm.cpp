@@ -53,7 +53,9 @@ int main(int argc, char* argv[]) {
     //print out the graph matrix
     cout<<*g;
 
-    a->colourGraph();
+    int k = a->colourGraph();
+    cout << "number of colours used: " << k << endl;
+
     //run algorithm
     a->printResults();
 
@@ -116,9 +118,9 @@ int main(int argc, char* argv[]) {
     //print out the graph matrix
     cout<<*g;
     //run algorithm
-    a->colourGraph();
     cout << "number of color: " << a->getColourNumber() << endl;
     a->printResults();
+
 */   
 
 }
