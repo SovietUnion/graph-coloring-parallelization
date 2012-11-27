@@ -1,4 +1,4 @@
-#include "ContractAlgorithm.h"
+#include "ParallelContractAlgorithm.h"
 #include <pthread.h>
 #include <stdint.h> 
 
@@ -6,12 +6,12 @@ int N; //number of threads;
 Algorithm *a; 
 
 // Helper function to pass class function into thread
-void *colourGraph(void *s) {
-   // nasty cast required since pthread create only take void* in 4th param
-   int slice = *((int*)(&s));
-   
-   a->colourGraph(slice);
-}
+//void *colourGraph(void *s) {
+//   // nasty cast required since pthread create only take void* in 4th param
+//   int slice = *((int*)(&s));
+//   
+//   a->colourGraph(slice);
+//}
 
 int main(int argc, char* argv[]) {
     unsigned int gSize = 7;
@@ -49,27 +49,16 @@ int main(int argc, char* argv[]) {
     // create N thread to run colour algorithm (later need to use command line arg)
     N = 1;
 
-    a = new ContractAlgorithm(g, N);
+    a = new ParallelContractAlgorithm(g, N);
     //print out the graph matrix
     cout<<*g;
 
-
-    pthread_t threads[N];
-    for (unsigned int i = 0; i < N; i++) {
-	pthread_create(&threads[i], NULL, colourGraph, (void *) i);
-    }
-
-
-    //Wait for all threads to complete 
-    for (unsigned int i=0; i<N; i++) {
-	pthread_join(threads[i], NULL);
-    }
+    a->colourGraph();
     //run algorithm
-    //a->colourGraph();
-   // cout << "number of color: " << a->getColourNumber() << endl;
     a->printResults();
+
     cout<<endl;
-     cout<<"graph after running contract algorithm\n"<<*g;
+    cout<<"graph after running contract algorithm\n"<<*g;
     delete a;
     delete g;
 /*
@@ -96,7 +85,7 @@ int main(int argc, char* argv[]) {
     g->addNeighbour(3, 6);
     g->addNeighbour(4, 6);
     g->addNeighbour(5, 6);
-    a = new ContractAlgorithm(g);
+    a = new ParallelContractAlgorithm(g,N);
 
     //print out the graph matrix
     cout<<*g;
@@ -112,7 +101,7 @@ int main(int argc, char* argv[]) {
     g->addNeighbour(0, 1);
     //print out the graph matrix
     cout<<*g;
-    a = new ContractAlgorithm(g);
+    a = new ParallelContractAlgorithm(g,N);
     //run algorithm
     a->colourGraph();
     cout << "number of color: " << a->getColourNumber() << endl;
@@ -122,7 +111,7 @@ int main(int argc, char* argv[]) {
 
     g->removeNeighbour(0, 1);
     delete a;
-    a = new ContractAlgorithm(g);
+    a = new ParallelContractAlgorithm(g);
 
     //print out the graph matrix
     cout<<*g;

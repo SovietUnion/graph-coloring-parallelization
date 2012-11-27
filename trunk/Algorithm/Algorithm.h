@@ -16,8 +16,8 @@ public:
     virtual void printResults() = 0;
 
     // Colour the graph G and return number of colours used
-    virtual int colourGraph(int slice) = 0;
-    
+    virtual int colourGraph() = 0;
+
 };
 
 #endif
