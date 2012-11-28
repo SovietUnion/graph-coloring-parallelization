@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 	
 
     // create N thread to run colour algorithm (later need to use command line arg)
-    N = 1;
+    N = 4;
 
     a = new ParallelContractAlgorithm(g, N);
     //print out the graph matrix
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
     cout<<"graph after running contract algorithm\n"<<*g;
     delete a;
     delete g;
-/*
+
     g = new MatrixGraph(testMatrix, gSize);
     // Make it complete graph K7,7
     g->addNeighbour(0, 3);
@@ -92,8 +92,8 @@ int main(int argc, char* argv[]) {
     //print out the graph matrix
     cout<<*g;
     //run algorithm
-    a->colourGraph();
-    cout << "number of color: " << a->getColourNumber() << endl;
+    k = a->colourGraph();
+    cout << "number of colours used: " << k << endl;
     a->printResults();
     cout<<endl;
     delete a;
@@ -105,22 +105,22 @@ int main(int argc, char* argv[]) {
     cout<<*g;
     a = new ParallelContractAlgorithm(g,N);
     //run algorithm
-    a->colourGraph();
-    cout << "number of color: " << a->getColourNumber() << endl;
+    k = a->colourGraph();
+    cout << "number of colours used: " << k << endl;
     a->printResults();
     cout<<endl;
 
 
     g->removeNeighbour(0, 1);
     delete a;
-    a = new ParallelContractAlgorithm(g);
+    a = new ParallelContractAlgorithm(g,N);
 
     //print out the graph matrix
     cout<<*g;
-    //run algorithm
-    cout << "number of color: " << a->getColourNumber() << endl;
+    k = a->colourGraph();
+    cout << "number of colours used: " << k << endl;
     a->printResults();
 
-*/   
+
 
 }
