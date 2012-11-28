@@ -1,6 +1,7 @@
 #include "ParallelContractAlgorithm.h"
 #include <pthread.h>
-
+#include <stdlib.h>
+#include <stdio.h>
 using namespace std;
 
 ParallelContractAlgorithm::ParallelContractAlgorithm(Graph* g, int threadcount) {
@@ -23,7 +24,8 @@ ParallelContractAlgorithm::printResults() {
 //**** NEED TO MODIFY THE GRAPH TO TAKE SLICE & THREAD INTO ACCOUNT
 void*
 ParallelContractAlgorithm::colourSubGraph(void* slice) {
-    cout<<slice<<endl;
+    cout<<(long)slice<<endl;
+    int slice_ = (int)((long)slice);
     int colournumber = 0;
     int size = g_->getSize();
     while (size > 0) {
@@ -75,27 +77,31 @@ int
 ParallelContractAlgorithm::colourGraph() {
 
     pthread_t threads[threadcount_];
-    pair<ParallelContractAlgorithm*,int> p;
+    pair<ParallelContractAlgorithm*,int>* p = new pair<ParallelContractAlgorithm*,int>[threadcount_];;
     int colourNumber = 0;
+    
 
-    p.first = this;
-
+    // Preassigned the slice number before running thread.
+    for (int i=1; i<threadcount_; i++) {
+       p[i].first = this;
+       p[i].second = i;
+       //args[i].to= ((i+1) * (SIZE-1))/N +1;
+     }
+    
     // Partition the graph and colour them
-    for (unsigned int i = 1; i < threadcount_; i++) {
-        p.second = i;
-	pthread_create(&threads[i], NULL, this->colour_helper, &p);
+    for (int i = 1; i < threadcount_; i++) {
+	pthread_create(&threads[i], NULL, this->colour_helper, &p[i]);
     }
 
     // main thread is a thread too :)
-    p.second = 0;
-    colourNumber = (int) colourSubGraph((void*) 0);
+    colourNumber = (long) colourSubGraph((void*) 0);
 
     //Wait for all the threads to complete 
     for (unsigned int i=1; i<threadcount_; i++) {
         void* tmp;
 	pthread_join(threads[i], &tmp);
-        if ((int)tmp > colourNumber)
-          colourNumber = (int)tmp;
+        if ((long)tmp > colourNumber)
+          colourNumber = (long)tmp;
     }
 
     // Check for conflicts
