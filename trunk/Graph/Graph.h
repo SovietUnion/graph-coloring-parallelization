@@ -57,6 +57,23 @@ public:
     // helper function to override ostream to work in subclass
     virtual ostream& print(ostream &os) const = 0;
 
+    /**Parallel specific functions **/
+    // Get the vertext with Maximal degree from a slice
+    virtual int getMaxDegreeVertex(int from, int to) = 0;
+    
+    // Return a set of nonNeighbours from a slice
+    virtual void nonNeighbours(int a, vector<unsigned int> &nonNeighbours, int from, int to) = 0;
+    
+    /**Below parallel functions might be removed, but need more testing*/
+    // Number of the common neighbours for a and b from a slice
+    virtual int getCommonNeighboursCount(int a, int b, int from, int to) = 0;    
+    
+    // Contract a into b within a slice;
+    virtual void contract(int a, int b, int from, int to) = 0;
+    
+    // Get the vertex degree
+    virtual int getDegree(int vertex, int from, int to) = 0;
+    
     // override default ostream so cout<<object can be achieved
     friend ostream& operator<<(ostream &os, const Graph &g) {
        g.print(os);
