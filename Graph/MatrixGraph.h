@@ -52,6 +52,23 @@ class MatrixGraph: public Graph {
     // reset colors;
     virtual void resetColours();
 
+    /**Parallel specific functions **/
+    // Get the vertex with Maximal degree from a slice
+    virtual int getMaxDegreeVertex(int from, int to);
+
+    // Return a set of nonNeighbours from a slice
+    virtual void nonNeighbours(int a, vector<unsigned int> &nonNeighbours, int from, int to);
+    
+    /**Below parallel functions might be removed, but need more testing*/
+    // Number of the common neighbours for a and b from a slice
+    virtual int getCommonNeighboursCount(int a, int b, int from, int to);
+    
+    // Contract a into b within a slice;
+    virtual void contract(int a, int b, int from, int to);
+    
+    // Get the vertex degree
+    virtual int getDegree(int vertex, int from, int to);
+    
     // format ostream output to printout the graph matrix
     virtual ostream& print(ostream &os) const;
     private: 

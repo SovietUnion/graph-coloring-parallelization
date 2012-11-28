@@ -1,7 +1,6 @@
 #include "ParallelContractAlgorithm.h"
 #include <pthread.h>
-#include <stdlib.h>
-#include <stdio.h>
+
 using namespace std;
 
 ParallelContractAlgorithm::ParallelContractAlgorithm(Graph* g, int threadcount) {
@@ -26,16 +25,23 @@ void*
 ParallelContractAlgorithm::colourSubGraph(void* slice) {
     cout<<(long)slice<<endl;
     int slice_ = (int)((long)slice);
-    int colournumber = 0;
     int size = g_->getSize();
-    while (size > 0) {
-        // determien a vertex x of maximal degree in G
-        int x = g_->getMaxDegreeVertex();
+    int from = (slice_ * size)/threadcount_;	
+    int to = ((slice_+1) * size)/threadcount_;
+    int colournumber = 0;
+    
+    // Update the size of slice(note: "to: is upper bound but exclusive)
+    size = to-from;
+    cout<<"slice no: "<<slice_<<" from: " <<from<<" to:" << to<<endl;
+    while ( size > 0) {
+        // determine a vertex x of maximal degree in G
+        int x = g_->getMaxDegreeVertex(from, to);
+
         // color x
         g_->setColour(x, ++colournumber);
         // retrieve set of non-neighbors for x
         vector<unsigned int> nn;
-        g_->nonNeighbours(x, nn);
+        g_->nonNeighbours(x, nn, from, to);
 
         int y = -1;
 
@@ -58,12 +64,12 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
 	    // set y colour
             g_->setColour(y, colournumber);
             // contract y to x
-            g_->contract(x, y);
+            g_->contract(x, y,from,to);
             size--;
 
             // update set of NN of non-neighbors of x
             nn.clear();
-            g_->nonNeighbours(x, nn);
+            g_->nonNeighbours(x, nn,from,to);
 
         }
         size--;
@@ -85,7 +91,6 @@ ParallelContractAlgorithm::colourGraph() {
     for (int i=1; i<threadcount_; i++) {
        p[i].first = this;
        p[i].second = i;
-       //args[i].to= ((i+1) * (SIZE-1))/N +1;
      }
     
     // Partition the graph and colour them

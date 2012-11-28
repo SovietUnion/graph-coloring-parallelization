@@ -151,6 +151,64 @@ MatrixGraph::resetColours() {
     }
 }
 
+/**Parallel functions*/
+int 
+MatrixGraph::getMaxDegreeVertex(int from, int to) {
+    int maxDegree = -1;
+    int maxVertex = 0;
+    int tempDegree = 0;
+    for (int i = from; i < to; i++) {
+        if (colours_[i] == 0 && (tempDegree = degrees_[i]) > maxDegree) {
+            maxDegree = tempDegree;
+            maxVertex = i;
+        }
+    }
+    return maxVertex;
+
+}
+
+
+void
+MatrixGraph::nonNeighbours(int a, vector<unsigned int> &nonNeighbours, int from, int to) {
+    for (int i = from; i < to; i++) {
+        if (graph[i][a] == 0 && a != i && colours_[i] == 0) {
+            nonNeighbours.push_back(i);
+        }
+    }
+}
+
+/**Below parallel functions might be removed, but need more testing*/
+int 
+MatrixGraph::getCommonNeighboursCount(int a, int b, int from, int to) {
+    int count = 0;
+    for (int i = from; i < to; i++) {
+        if (graph[i][a] == 1 && graph[i][b] == 1) {
+            count++;
+        }
+    }
+    return count;
+}
+
+void 
+MatrixGraph::contract(int a, int b, int from, int to) {
+    // Grab all b's edges and contract into a
+    for (int i = from; i < to; i++) {
+        if (graph[i][b] == 1) {
+            graph[i][a] = 1;
+            degrees_[a]++;
+        }
+    }
+}
+
+int
+MatrixGraph::getDegree(int vertex, int from, int to) {
+    int count = 0;
+    for (int i = from; i < to; i++) {
+        if (graph[i][vertex] == 1)
+            count++;
+    }
+    return count;
+}
 
 ostream& 
 MatrixGraph::print(ostream &os) const
