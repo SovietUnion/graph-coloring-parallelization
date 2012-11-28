@@ -127,7 +127,7 @@ MatrixGraph::contract(int a, int b) {
     // Grab all b's edges and contract into a
     for (int i = 0; i < size; i++) {
         if (graph[b][i] == 1) {
-            graph[a][i] = graph[i][a] = 1;
+            graph[a][i] = 1;
             degrees_[a]++;
         }
     }
