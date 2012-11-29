@@ -1,6 +1,7 @@
 #include "ParallelContractAlgorithm.h"
 #include <pthread.h>
 #include <queue>
+#include <set>
 
 using namespace std;
 
@@ -67,9 +68,8 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
 	    // set y colour
             g_->setColour(y, colournumber);
             // contract y to x
-            g_->contract(x, y,from,to);
-            cout << "contracting " << x << " " << y << endl;
-            cout << *g_;
+            //g_->contract(x, y,from,to);
+            g_->contract(x, y);
             size--;
 
             // update set of NN of non-neighbors of x
@@ -83,7 +83,81 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
     return (void*)colournumber;
 }
 
+void*
+ParallelContractAlgorithm::detectConflict(void* arg) {
 
+    void** p = (void**) arg;
+    int slice_ = (int)((long) p[1]);
+    queue<pair<int,int> >* conflicts = (queue<pair<int,int> >*) p[2];
+    int size = g_->getSize();
+    int from = (slice_ * size)/threadcount_;	
+    int to = ((slice_+1) * size)/threadcount_;
+    unsigned int* colours = g_->getColours();
+
+    for (unsigned slice1 = 0; slice1 < threadcount_; slice1++) {
+
+      // block 1 from to end
+      int from = (slice1 * size)/threadcount_;	
+      int to = ((slice1+1) * size)/threadcount_;
+
+      // Update the size of slice(note: "to: is upper bound but exclusive)
+      int ss = to-from;
+
+      // slice the block again and compare against all nodes not within the block
+      int from2 = from + (slice_ * ss)/threadcount_;	
+      int to2 = from + ((slice_+1) * ss)/threadcount_;
+
+      // only check the slice of the block that this thread is responsible
+      for (int j = from2; j < to2; j++) {
+        // only check outside the block
+        for (int k = to; k < size; k++) {
+            // there is a conflict if the 2 colours are the same
+            // and node j and k are neighbours
+            if (colours[j] == colours[k] && g_->isNeighbours(j,k)) {
+              pair<int,int> tmp;
+
+              if (g_->getDegree(j) < g_->getDegree(k)){
+                 tmp.first = j; tmp.second = k;
+              } else {
+                 tmp.first = k; tmp.second = j;
+              }
+
+              conflicts->push(tmp);
+            }
+        }
+      }
+    }
+
+}
+
+
+unsigned int
+ParallelContractAlgorithm::findFreeColour(int a, int colourNumber) {
+
+  vector<unsigned int> na;
+  set<unsigned int> neighbour_colours;
+  set<unsigned int>::iterator it;
+  unsigned int* colours = g_->getColours();
+
+  g_->neighbours(a,na);
+
+  // insert the set of free colour
+  neighbour_colours.insert(colourNumber);
+  it = neighbour_colours.begin();
+  for(unsigned int j = colourNumber - 1; j > 0; j--) 
+     neighbour_colours.insert(it,j);
+    
+  // Go through its neighbours and remove neighbouring colours from free colour
+  for (int j = 0; j < na.size() && !neighbour_colours.empty(); j++) 
+     neighbour_colours.erase(colours[na[j]]);
+
+  // start a blend new colour becasue there are no free colours
+  if (neighbour_colours.empty())
+     return colourNumber + 1;
+  
+  // return a free colour 
+  return *neighbour_colours.begin();
+}
 
 int
 ParallelContractAlgorithm::colourGraph() {
@@ -119,6 +193,56 @@ ParallelContractAlgorithm::colourGraph() {
     }
 
     // Check for conflicts
+    // Partition the graph and colour them
+    for (int i = 1; i < threadcount_; i++) {
+        pthread_create(&threads[i], NULL, this->conflict_helper, (void*) p[i]);
+    }
+
+	pthread_join(threads[1], NULL);
+    // main thread is a thread too :)
+    detectConflict((void*) p[0]);
+
+    //Wait for all the threads to complete 
+    for (unsigned int i=1; i<threadcount_; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    // Print out conflits
+    cout << "conflicts:" << endl;
+    unsigned int* colours = g_->getColours();
+    for (int i = 0; i < threadcount_; i++) {
+
+       // Resolve conflicts one by one
+       while (!conflicts[i].empty()) {
+         int a = conflicts[i].front().first;
+         int b = conflicts[i].front().second;
+         int newColourA, newColourB;
+         conflicts[i].pop();
+
+         // Try to find a new colour for node a
+         newColourA = findFreeColour(a,colourNumber);
+
+         // if the new colour increases the colour number
+         // try to find a new colour for node b
+         if (newColourA > colourNumber) {
+           newColourB = findFreeColour(b,colourNumber);
+
+           // if node B still can't find a free colour
+           // give node A the new colour
+           if (newColourB > colourNumber) {
+              colours[a] = newColourA;
+              colourNumber++;
+           } else
+              colours[b] = newColourB;
+         } else {
+           colours[a] = newColourA;
+         }
+
+         cout << "(" << a << "," << b << ") ";
+       }
+       cout << endl;
+    }
+
 
     for (int i = 0; i < threadcount_; i++)
         delete [] p[i];
