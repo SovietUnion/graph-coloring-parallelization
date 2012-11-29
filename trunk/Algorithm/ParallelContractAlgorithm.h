@@ -19,12 +19,19 @@ protected:
     // Helper class
     static void* colour_helper(void* c)
     {
-       pair<ParallelContractAlgorithm*,int>* p = (pair<ParallelContractAlgorithm*,int>*) c;
-       return  p->first->colourSubGraph((void*) p->second);
+       void** p = (void**) c;
+       return  ((ParallelContractAlgorithm*)p[0])->colourSubGraph((void*) p[1]);
     }
+    static void* conflict_helper(void* c)
+    {
+       void** p = (void**) c;
+       return  ((ParallelContractAlgorithm*)p[0])->detectConflict(c);
+    }
+
 
     // Colour a slice of the graph
     void* colourSubGraph(void* slice);
+    void* detectConflict(void* arg);
 
 };
 

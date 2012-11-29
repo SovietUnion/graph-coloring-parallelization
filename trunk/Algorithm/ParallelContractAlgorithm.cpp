@@ -1,5 +1,6 @@
 #include "ParallelContractAlgorithm.h"
 #include <pthread.h>
+#include <queue>
 
 using namespace std;
 
@@ -42,6 +43,8 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
         // retrieve set of non-neighbors for x
         vector<unsigned int> nn;
         g_->nonNeighbours(x, nn, from, to);
+        vector<bool> b;
+        g_->backupVertex(x,b);
 
         int y = -1;
 
@@ -65,6 +68,8 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
             g_->setColour(y, colournumber);
             // contract y to x
             g_->contract(x, y,from,to);
+            cout << "contracting " << x << " " << y << endl;
+            cout << *g_;
             size--;
 
             // update set of NN of non-neighbors of x
@@ -72,6 +77,7 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
             g_->nonNeighbours(x, nn,from,to);
 
         }
+        g_->restoreVertex(x,b);
         size--;
     }
     return (void*)colournumber;
@@ -83,19 +89,22 @@ int
 ParallelContractAlgorithm::colourGraph() {
 
     pthread_t threads[threadcount_];
-    pair<ParallelContractAlgorithm*,int>* p = new pair<ParallelContractAlgorithm*,int>[threadcount_];;
+    queue<pair<int,int> >* conflicts = new queue<pair<int,int> >[threadcount_];
+    void*** p = new void**[threadcount_];
     int colourNumber = 0;
     
 
     // Preassigned the slice number before running thread.
-    for (int i=1; i<threadcount_; i++) {
-       p[i].first = this;
-       p[i].second = i;
+    for (int i=0; i<threadcount_; i++) {
+       p[i] = new void*[3];
+       p[i][0] = (void*) this;
+       p[i][1] = (void*) ((long)i);
+       p[i][2] = (void*) &conflicts[i];
      }
     
     // Partition the graph and colour them
     for (int i = 1; i < threadcount_; i++) {
-	pthread_create(&threads[i], NULL, this->colour_helper, &p[i]);
+        pthread_create(&threads[i], NULL, this->colour_helper, (void*) p[i]);
     }
 
     // main thread is a thread too :)
@@ -110,7 +119,10 @@ ParallelContractAlgorithm::colourGraph() {
     }
 
     // Check for conflicts
-    //queue<pair<int,int>>* conflicts = new queue<pair<int,int>>[threadcount_];
+
+    for (int i = 0; i < threadcount_; i++)
+        delete [] p[i];
+    delete [] p;
 
     return colourNumber;
 }
