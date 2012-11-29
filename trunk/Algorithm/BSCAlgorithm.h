@@ -1,11 +1,12 @@
 //BSCAlgorithm.h
 #ifndef BSCALGORITHM_H
 #define BSCALGORITHM_H
+
 #include "Algorithm.h"
+using namespace std;
 
-class BSCAlgorithm : public Algorithm {
+class BSCAlgorithm : public Algorithm{
 public:
-
     // Constructor
     BSCAlgorithm(Graph* g);
 
