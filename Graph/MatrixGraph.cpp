@@ -182,7 +182,7 @@ int
 MatrixGraph::getCommonNeighboursCount(int a, int b, int from, int to) {
     int count = 0;
     for (int i = from; i < to; i++) {
-        if (graph[i][a] == 1 && graph[i][b] == 1) {
+        if (graph[a][i] == 1 && graph[b][i] == 1) {
             count++;
         }
     }
