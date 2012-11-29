@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 	
 
     // create N thread to run colour algorithm (later need to use command line arg)
-    N = 1;
+    N = 3;
 
     a = new ParallelContractAlgorithm(g, N);
     //print out the graph matrix

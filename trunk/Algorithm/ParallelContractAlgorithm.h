@@ -16,7 +16,7 @@ public:
 
 protected:
 
-    // Helper class
+    // Helper Function
     static void* colour_helper(void* c)
     {
        void** p = (void**) c;
@@ -28,6 +28,8 @@ protected:
        return  ((ParallelContractAlgorithm*)p[0])->detectConflict(c);
     }
 
+    // Find a free colour for vertex a
+    unsigned int findFreeColour(int a, int colourNumber);
 
     // Colour a slice of the graph
     void* colourSubGraph(void* slice);
