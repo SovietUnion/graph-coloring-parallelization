@@ -66,6 +66,10 @@ class MatrixGraph: public Graph {
     // Contract a into b within a slice;
     virtual void contract(int a, int b, int from, int to);
     
+    // Backup and restore a vertex
+    virtual void backupVertex (int a, vector<bool> &b);
+    virtual void restoreVertex(int a, vector<bool> b);
+    
     // Get the vertex degree
     virtual int getDegree(int vertex, int from, int to);
     

@@ -171,7 +171,7 @@ MatrixGraph::getMaxDegreeVertex(int from, int to) {
 void
 MatrixGraph::nonNeighbours(int a, vector<unsigned int> &nonNeighbours, int from, int to) {
     for (int i = from; i < to; i++) {
-        if (graph[i][a] == 0 && a != i && colours_[i] == 0) {
+        if (graph[a][i] == 0 && a != i && colours_[i] == 0) {
             nonNeighbours.push_back(i);
         }
     }
@@ -193,8 +193,8 @@ void
 MatrixGraph::contract(int a, int b, int from, int to) {
     // Grab all b's edges and contract into a
     for (int i = from; i < to; i++) {
-        if (graph[i][b] == 1) {
-            graph[i][a] = 1;
+        if (graph[b][i] == 1) {
+            graph[a][i] = 1;
             degrees_[a]++;
         }
     }
@@ -208,6 +208,16 @@ MatrixGraph::getDegree(int vertex, int from, int to) {
             count++;
     }
     return count;
+}
+
+void
+MatrixGraph::backupVertex(int a, vector<bool> &b) {
+   b = graph[a];
+}
+
+void
+MatrixGraph::restoreVertex(int a, vector<bool> b) {
+   graph[a] = b;
 }
 
 ostream& 
