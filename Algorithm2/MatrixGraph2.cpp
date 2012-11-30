@@ -1,4 +1,4 @@
-#include "MatrixGraph.h"
+#include "MatrixGraph2.h"
 #include<vector>
 #include<algorithm>
 using namespace std;
@@ -52,16 +52,6 @@ MatrixGraph::getColours() {
 
     return colours_;
 }
-/*
-ostream& operator<<(ostream &os, const MatrixGraph &g) {
-    for (int i = 0; i < g.size; i++) {
-        for (int j = 0; j < g.size; j++) {
-            os << g.graph[i][j] << " ";
-        }
-        os << endl;
-    }
-    return os;
-}*/
 
 void 
 MatrixGraph::printGraph() {
@@ -88,6 +78,7 @@ MatrixGraph::getNeighbours(int a) {
 }
 
 //Get all the degrees
+
 vector<int> MatrixGraph::getAllDegree(vector<int> &AllDegree){
 	   vector<int> B;
        for(int i=0;i<getSize();i++){
@@ -96,7 +87,6 @@ vector<int> MatrixGraph::getAllDegree(vector<int> &AllDegree){
        } 
 	   return B;
 }  
-
 //Sort the vertices according to non-increasing degrees
 
 vector<int> MatrixGraph::SortbyDegree(vector<int> &AllDegree){
@@ -111,49 +101,42 @@ vector<int> MatrixGraph::SortbyDegree(vector<int> &AllDegree){
            }
        } 
 		   return B;
-}
-
+}     
 //Get the set of free colours, which used but not present in neighbor of x
 vector<int>
 MatrixGraph::getFreeColours(int x,int i,vector<int> &colors){
-	       vector<int> U;
-		   for(int k=1;k<colors[i]+2;i++){
+	          vector<int> U;
+			  vector<int> Used;
+			 // cout<<"colors[i]+2:"<<colors[i]+2<<endl;
+		   for(int k=1;k<colors[i]+2;k++){
 			   for(int j=0;j<getSize();j++){
-				   if(isNeighbours(j,x) && colours_[j]==k) {;}//If the colour appears at the adjacent vertex, skip.					    
-				   else{ U.push_back(k);}
-			   }            
-		   }
-           /*
-           for(int i=0;i<=x;i++){
-			 vector<int> ::iterator it;
-		     for(it=U.begin();it!=U.end();){
-					
-					if(colours_[i]==*it){
-						 it=U.erase(it);
+				    if(colours_[j]==k && isNeighbours(j,x)){
+						Used.push_back(k);
+						//cout<<"vertex#"<<j<<" color# "<<k<<endl;
+					    
 					}
-                   			
-					else{ 
-						++it;
-					}
-					//Print Current U
-                    vector<int> ::iterator iter;
-					for(iter=U.begin();iter!=U.end();iter++){
-		            cout<<*iter<<" ";
-					}
-					cout<<endl;
-		     }
-		  }    
-		  */
-			      sort(U.begin(),U.end());
-					/*
-					vector<int> ::iterator iter;
-					for(iter=U.begin();iter!=U.end();iter++){
-		            cout<<*iter<<" "<<endl;
-					}
-					*/
-                   return U;
-}
 
+		      }
+              
+		  }
+          for(int k=1;k<colors[i]+2;k++){
+			  U.push_back(k);
+		  }
+		  vector<int> ::iterator iter;
+		  for(int i=0;i<(int)Used.size();i++){
+			   for(iter=U.begin();iter!=U.end();){
+				   if(Used[i]==*iter){
+					   iter=U.erase(iter);
+				   }
+		           else{ 
+						++iter;
+				   }
+				  		   
+			   }
+		  }
+		  sort(U.begin(),U.end());
+			   return U;
+}
 //Get the degree of saturation  vertex x
 int
 MatrixGraph::getVertexDSATUR(int x){
@@ -161,29 +144,35 @@ MatrixGraph::getVertexDSATUR(int x){
 	neighbours=getNeighbours(x);
 	//Count the number of colours around x
 	int count=0;
-	sort(neighbours.begin(),neighbours.end());
+	vector<int> adjacentColor;
+	for(int i=0;i<(int)neighbours.size();i++){
+	 adjacentColor.push_back(colours_[neighbours[i]]);
+	}
 	
-	for(int i=0;i<(int)neighbours.size()-1;i++){
-		if(neighbours[i]!=neighbours[i+1] && neighbours[i]!=0){
+	sort(adjacentColor.begin(),adjacentColor.end());
+	
+	for(int i=0;i<(int)adjacentColor.size()-1;i++){
+		if(adjacentColor[i]!=adjacentColor[i+1] && adjacentColor[i]!=0){
 			count++;
 		}
 	}
 	    count=count+1;
 		return count;
 }
-
 //Get the vertex with maximum degree of saturation
 int
 MatrixGraph::getMaxDSATURvertex(vector<int> &A){
 	//Scan all the vertex to find a uncolored vertex with the Max degree of saturation
 	int MaxDSATUR=0;
 	int MaxDSATURvertex=0;
-	int i;
-  //Using A[i] to index the vertex is to return vertex according to sequence in A[i] when MaxDSATURvertexs are more than one.
-	for(i=0;i<getSize();i++){
-		if(colours_[A[i]]=0 && getVertexDSATUR(A[i])>MaxDSATUR){
-         MaxDSATUR=getVertexDSATUR(i);
-		 MaxDSATURvertex=A[i];
+	int m;
+	//Using A[i] to index the vertex is to return vertex according to sequence in A[i] when MaxDSATURvertexs are more than one.
+	for(m=0;m<getSize();m++){
+		if(colours_[A[m]]==0 && getVertexDSATUR(A[m])>MaxDSATUR ){
+	    
+
+         MaxDSATUR=getVertexDSATUR(m);
+		 MaxDSATURvertex=A[m];
 		}		
 	}
 	return MaxDSATURvertex;
@@ -216,7 +205,6 @@ MatrixGraph::getMax(int a,int b){
 	  return b;
 	}
 }
-
 //Remove colour k
 void
 MatrixGraph::removeColour(int k,vector<int> &U){
@@ -231,19 +219,16 @@ MatrixGraph::removeColour(int k,vector<int> &U){
 					}
     }
 }
-
 //Sort the set of colour(U) according to non-decreasing order
 void
 MatrixGraph::sortU(vector<int> &U){
    sort(U.begin(),U.end());
 }
-
 //Uncolour a vertex
 void
 MatrixGraph::unColour(int x){
    colours_[x]=0;
 }
-
 //Get the colour of vertex with index x
 int 
 MatrixGraph::getColour(int x) {
