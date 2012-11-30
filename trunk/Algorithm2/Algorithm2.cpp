@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
-#include "Algorithm.h"
+#include "Algorithm2.h"
 
 using namespace std;
 
