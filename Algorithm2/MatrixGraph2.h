@@ -1,15 +1,15 @@
 #ifndef MATRIXGRAPH_H
 #define MATRIXGRAPH_H
 
-#include "Graph.h"
+#include "Graph2.h"
 using namespace std;
 class MatrixGraph: public Graph {
 
    public:
-    // Constructor that take in a pregenerated graph
+     // Constructor that take in a pregenerated graph
     MatrixGraph(const vector<vector<bool> > &g, int mSize);
 
-	  // Return true if a and b are neighbours
+	   // Return true if a and b are neighbours
     virtual bool isNeighbours(int a, int b);
 	
     // Add an edge between a and b
@@ -27,19 +27,19 @@ class MatrixGraph: public Graph {
     // get colors of graph
     virtual int* getColours();
 
-    // format ostream output to printout the graph matrix
+     // format ostream output to printout the graph matrix
     friend std::ostream& operator<<(ostream &os, const MatrixGraph &g);
 
-	  //Print out graph
+	   //Print out graph
 	  virtual void printGraph();
    
-    //Get all the degrees
+     //Get all the degrees
     virtual vector<int> getAllDegree(vector<int> &AllDegree);
    
-    //Sort the vertices according to non-increasing degrees
+     //Sort the vertices according to non-increasing degrees
     virtual vector<int> SortbyDegree(vector<int> &AllDegree);
 
-	  //Get the degree of saturation of vertex x
+	   //Get the degree of saturation of vertex x
 	  virtual int getVertexDSATUR(int x);
 
 	  //Get the vertex with maximum degree of saturation
@@ -74,6 +74,5 @@ class MatrixGraph: public Graph {
         vector<vector<bool> > graph;
 
 };
-
 
 #endif
