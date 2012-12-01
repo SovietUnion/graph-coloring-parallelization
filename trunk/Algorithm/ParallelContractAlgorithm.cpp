@@ -44,10 +44,10 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
         // color x
         if(firstRun) {
              firstRun = false;
-        } else if (secondRun) {
+        } else if (slice_ > 0 && secondRun) {
              secondRun = false;
              colournumber = 0;
-        } else if (slice_ != 0 && colournumber == slice_ + 1) {
+        } else if (slice_ > 0 && colournumber == slice_) {
              colournumber++;
         }
         colournumber++;
