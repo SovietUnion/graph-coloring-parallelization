@@ -193,12 +193,11 @@ ParallelContractAlgorithm::colourGraph() {
     }
 
     // Check for conflicts
-    // Partition the graph and colour them
+    // Look for conflicts in parallel
     for (int i = 1; i < threadcount_; i++) {
         pthread_create(&threads[i], NULL, this->conflict_helper, (void*) p[i]);
     }
 
-	pthread_join(threads[1], NULL);
     // main thread is a thread too :)
     detectConflict((void*) p[0]);
 
@@ -227,13 +226,14 @@ ParallelContractAlgorithm::colourGraph() {
          if (newColourA > colourNumber) {
            newColourB = findFreeColour(b,colourNumber);
 
+           // give node B the new colour
+           colours[b] = newColourB;
+
            // if node B still can't find a free colour
-           // give node A the new colour
+           // increase the colour count
            if (newColourB > colourNumber) {
-              colours[a] = newColourA;
               colourNumber++;
-           } else
-              colours[b] = newColourB;
+           }
          } else {
            colours[a] = newColourA;
          }
