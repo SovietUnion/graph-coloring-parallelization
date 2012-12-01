@@ -30,7 +30,9 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
     int size = g_->getSize();
     int from = (slice_ * size)/threadcount_;	
     int to = ((slice_+1) * size)/threadcount_;
-    int colournumber = 0;
+    int colournumber = slice_;
+    bool firstRun = true;
+    bool secondRun = true;
     
     // Update the size of slice(note: "to: is upper bound but exclusive)
     size = to-from;
@@ -40,7 +42,17 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
         int x = g_->getMaxDegreeVertex(from, to);
 
         // color x
-        g_->setColour(x, ++colournumber);
+        if(firstRun) {
+             firstRun = false;
+        } else if (secondRun) {
+             secondRun = false;
+             colournumber = 0;
+        } else if (slice_ != 0 && colournumber == slice_ + 1) {
+             colournumber++;
+        }
+        colournumber++;
+
+        g_->setColour(x, colournumber);
         // retrieve set of non-neighbors for x
         vector<unsigned int> nn;
         g_->nonNeighbours(x, nn, from, to);
@@ -80,6 +92,10 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
         g_->restoreVertex(x,b);
         size--;
     }
+
+    if (slice_ + 1 >= colournumber)
+       colournumber = slice_ + 1;
+
     return (void*)colournumber;
 }
 
@@ -90,8 +106,6 @@ ParallelContractAlgorithm::detectConflict(void* arg) {
     int slice_ = (int)((long) p[1]);
     queue<pair<int,int> >* conflicts = (queue<pair<int,int> >*) p[2];
     int size = g_->getSize();
-    int from = (slice_ * size)/threadcount_;	
-    int to = ((slice_+1) * size)/threadcount_;
     unsigned int* colours = g_->getColours();
 
     for (unsigned slice1 = 0; slice1 < threadcount_; slice1++) {
@@ -148,8 +162,9 @@ ParallelContractAlgorithm::findFreeColour(int a, int colourNumber) {
      neighbour_colours.insert(it,j);
     
   // Go through its neighbours and remove neighbouring colours from free colour
-  for (int j = 0; j < na.size() && !neighbour_colours.empty(); j++) 
+  for (int j = 0; j < na.size() && !neighbour_colours.empty(); j++) {
      neighbour_colours.erase(colours[na[j]]);
+  }
 
   // start a blend new colour becasue there are no free colours
   if (neighbour_colours.empty())
@@ -165,7 +180,7 @@ ParallelContractAlgorithm::colourGraph() {
     pthread_t threads[threadcount_];
     queue<pair<int,int> >* conflicts = new queue<pair<int,int> >[threadcount_];
     void*** p = new void**[threadcount_];
-    int colourNumber = 0;
+    long colourNumber = 0;
     
 
     // Preassigned the slice number before running thread.
@@ -207,8 +222,8 @@ ParallelContractAlgorithm::colourGraph() {
     }
 
     // Print out conflits
-    cout << "conflicts:" << endl;
     unsigned int* colours = g_->getColours();
+
     for (int i = 0; i < threadcount_; i++) {
 
        // Resolve conflicts one by one
@@ -217,6 +232,10 @@ ParallelContractAlgorithm::colourGraph() {
          int b = conflicts[i].front().second;
          int newColourA, newColourB;
          conflicts[i].pop();
+
+         // Make sure it is still a conflict
+         if (colours[a] != colours[b])
+           continue;
 
          // Try to find a new colour for node a
          newColourA = findFreeColour(a,colourNumber);
@@ -238,7 +257,6 @@ ParallelContractAlgorithm::colourGraph() {
            colours[a] = newColourA;
          }
 
-         cout << "(" << a << "," << b << ") ";
        }
        cout << endl;
     }
