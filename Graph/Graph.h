@@ -66,7 +66,7 @@ public:
     
     /**Below parallel functions might be removed, but need more testing*/
     // Number of the common neighbours for a and b from a slice
-    virtual int getCommonNeighboursCount(int a, int b, int from, int to) = 0;    
+    virtual int getCommonNeighboursCount(int a, int b, int avoidColour) = 0;    
 
     // Backup and restore a vertex
     virtual void backupVertex (int a, vector<bool> &b) = 0;

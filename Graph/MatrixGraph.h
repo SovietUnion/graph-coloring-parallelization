@@ -61,7 +61,7 @@ class MatrixGraph: public Graph {
     
     /**Below parallel functions might be removed, but need more testing*/
     // Number of the common neighbours for a and b from a slice
-    virtual int getCommonNeighboursCount(int a, int b, int from, int to);
+    virtual int getCommonNeighboursCount(int a, int b, int avoidColour);    
     
     // Contract a into b within a slice;
     virtual void contract(int a, int b, int from, int to);
