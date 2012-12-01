@@ -179,9 +179,11 @@ MatrixGraph::nonNeighbours(int a, vector<unsigned int> &nonNeighbours, int from,
 
 /**Below parallel functions might be removed, but need more testing*/
 int 
-MatrixGraph::getCommonNeighboursCount(int a, int b, int from, int to) {
+MatrixGraph::getCommonNeighboursCount(int a, int b, int avoidColour) {
     int count = 0;
-    for (int i = from; i < to; i++) {
+    for (int i = 0; i < size; i++) {
+        if (colours_[i] == avoidColour)
+            continue;
         if (graph[a][i] == 1 && graph[b][i] == 1) {
             count++;
         }
