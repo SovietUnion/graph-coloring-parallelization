@@ -46,7 +46,7 @@ class MatrixGraph: public Graph {
 	virtual int getMaxDSATURvertex(vector<int> &A);
    
     //Get the set of free colours, which used but not present in neighbor of x
-    virtual vector<int> getFreeColours(int x,int i,vector<int> &colors);
+    virtual vector<int> getFreeColours(int x);
    
     //Get the number of used colour
     virtual int getUsedColourNum(int i,vector<int> &U);
