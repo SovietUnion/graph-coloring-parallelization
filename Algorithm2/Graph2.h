@@ -47,8 +47,8 @@ public:
 	  //Get the vertex with maximum degree of saturation
 	  virtual int getMaxDSATURvertex(vector<int> &A)= 0;
    
-    //Get the set of free colours, which used but not present in neighbor of x
-    virtual vector<int> getFreeColours(int x,int i,vector<int> &colors)= 0;
+     //Get the set of free colours, which used but not present in neighbor of x
+    virtual vector<int> getFreeColours(int x)= 0;
    
     //Get the number of used colour
     virtual int getUsedColourNum(int i,vector<int> &U)= 0;
