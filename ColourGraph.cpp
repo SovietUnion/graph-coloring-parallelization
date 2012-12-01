@@ -3,9 +3,9 @@
 #include <sstream> 
 #include <stdlib.h>
 #include <ctime>
-#include "../Graph/Graph.h"
-#include "../Graph/Algorithm.h"
-#include "../Graph/MatrixGraph.h"
+#include "./Graph/Graph.h"
+#include "./Algorithm/Algorithm.h"
+#include "./Graph/MatrixGraph.h"
 
 using namespace std;
 
