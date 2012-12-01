@@ -28,8 +28,8 @@ BSCAlgorithm::colourGraph() {
 
     return 0;
 }
-
 */
+
 //Test BSC
 
 int
@@ -80,7 +80,7 @@ BSCAlgorithm::colourGraph(){
 		 cout<<*itt<<" ";
 	     }
          cout<<endl;
-         U=g_->getFreeColours(x,i,colors);//get the set of free colours of x, the set U
+         U=g_->getFreeColours(x);//get the set of free colours of x, the set U
          }
 
          //Print i,x,U
@@ -90,7 +90,7 @@ BSCAlgorithm::colourGraph(){
 	     cout<<U[s]<<" ";
 	     }
 		 cout<<endl;
-		 //////////////////
+
 
 		 if(U.size()>0){
          k=U[0];        //selected free colour
@@ -107,7 +107,7 @@ BSCAlgorithm::colourGraph(){
 	        }
 		    cout<<endl;
 			cout<<"**********"<<endl;
-		 ///////////////////
+		
          }
 
 		 else {           //U=0,backtrack one position
@@ -126,13 +126,13 @@ BSCAlgorithm::colourGraph(){
 		 cout<<endl;
 		*/
 	   // cout<<"back: "<<back<<endl;
-       
+     
 	   if(back){
          if(start>=0){
             //cout<<"start2: "<<start<<endl;
             x=A[start];  //new starting vertex
             g_->unColour(x);//uncolour x
-			U=g_->getFreeColours(x,i,colors);
+			U=g_->getFreeColours(x);
          }
        }
 	   
@@ -145,10 +145,10 @@ BSCAlgorithm::colourGraph(){
            if(g_->getColour(A[least])==optColourNum)
                break;
          } 
-		 
+		/* 
          i=least;   
 		 cout<<"least="<<i<<endl;
-		 /*
+		 
          start=i-1;
 		  cout<<"start="<<start<<endl;
 		 
@@ -162,18 +162,20 @@ BSCAlgorithm::colourGraph(){
 		 
          for(int n=0;n<=start;n++){
            x=A[n];
-           U=g_->getFreeColours(x,n,colors);
+           U=g_->getFreeColours(x);
            for(int y=0;y<(int)U.size();y++){//remove from U all colours>=optColourNumber;
              if(U[y]>=optColourNum){
              g_->removeColour(U[y],U);
-			 U=g_->getFreeColours(x,i,colors);
              }
-           }//the current colouring is to be improved
-         }	*/
-	   }
-	
-     }
 
+           }//the current colouring is to be improved
+         }
+	     x=A[start];
+	     U=g_->getFreeColours(x); 
+	   }*/
+	 
+     }
+	} 
     return Fopt;   
 }
 
@@ -220,7 +222,7 @@ void main() {
 	cout<<"Graph:  "<<endl;
 	g->printGraph();
 
-   /*
+/*
    //Test getNeighbours(int a)
 	vector<int> neighbours;
 	neighbours=g->getNeighbours(1);
@@ -232,19 +234,14 @@ void main() {
 	cout<<endl;
 	//print all color set
 	cout<<"setColour"<<endl;
-	/*
-	for(int v=0;v<(int)gSize;v++){
-	g->setColour(v, v+1);
-	}
-	*/
-	/*
+	
 	g->setColour(0,1);//i=0
 	g->setColour(1,2);//i=1
 	g->setColour(5,3);//i=2
 	g->setColour(2,2);//i=3
 	g->setColour(3,1);//i=4
 	g->setColour(4,3);//i=5
-
+	
 	a->printResults();
 	cout<<endl;
 	vector<int> AllDegree;
@@ -271,26 +268,28 @@ void main() {
 	//Test getMaxDSATURvertex
 	cout<<"Test getMaxDSATURvertex:"<<endl;
 	cout<<"MaxDSATURvertex: "<<g->getMaxDSATURvertex(B)<<endl;
-	/*
-	//Test getFreeColours(int x,int i,vector<int> &colors)
-	cout<<"Test getFreeColours(int x,int i,vector<int> &colors)"<<endl;
+	
+    //Test getFreeColours(int x,int i,vector<int> &colors)
+	cout<<"Test getFreeColours(int x)"<<endl;
 	//print all color set
 	cout<<"setColour when i=4:"<<endl;
 
-	g->setColour(0,1);//i=0
-	g->setColour(1,2);//i=1
-	g->setColour(5,3);//i=2
-	g->setColour(2,2);//i=3
-	g->setColour(3,1);//i=4
-	g->setColour(4,3);//i=5
+	  g->setColour(0,1);//i=0 x=0
+	  g->setColour(1,2);//i=1 x=1
+	  g->setColour(5,3);//i=2 x=5
+	  g->setColour(2,2);//i=3 x=2
+	  g->setColour(3,1);//i=4 x=3
+	  g->setColour(4,3);//i=5 x=4
+	//g->setColour(6,4);//i=6 x=6
 
 	a->printResults();
 	cout<<endl;
 	
-	int x=0; 
+	int x=6; 
+	vector<int> U;
 	int i=0;
 	vector<int> colors;
-	vector<int> U;
+	
 	colors.push_back(0);//colors(-1)
 	colors.push_back(1);//colors(0)
     colors.push_back(2);//colors(1)
@@ -299,13 +298,15 @@ void main() {
 	colors.push_back(3);//colors(4)
 	colors.push_back(3);//colors(5)
 	
-	U=g->getFreeColours(x,i,colors);
+	U=g->getFreeColours(x);
+	cout<<"U set is:"<<endl;
 	for(int i=0;i<(int)U.size();i++){
-	cout<<U[i]<<endl;
+	cout<<U[i]<<" ";
 	}
+	cout<<endl;
 	cout<<"U.size()="<<U.size()<<endl;
-
-
+	
+	
 	//Test getAllDegree(vector<int> &AllDegree)
 	cout<<"Test getAllDegree"<<endl;
 	vector<int> AllDegree;//Set used to store the vertex degree
@@ -341,7 +342,6 @@ void main() {
 	cout<<"The Original U set is:"<<endl;
 	for(itt=U.begin();itt!=U.end();itt++){
 		 cout<<*itt<<" ";
-
 	}
 	     cout<<endl;
 	  g->getFreeColours(4,U);
