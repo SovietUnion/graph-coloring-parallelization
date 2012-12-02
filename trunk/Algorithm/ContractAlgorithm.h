@@ -6,7 +6,7 @@ class ContractAlgorithm : public Algorithm {
 public:
 
     // Constructor
-    ContractAlgorithm(Graph* g, int threadcount);
+    ContractAlgorithm(Graph* g);
 
     // Print out the results
     virtual void printResults();
