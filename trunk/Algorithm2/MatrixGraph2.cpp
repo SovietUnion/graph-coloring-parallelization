@@ -102,70 +102,36 @@ vector<int> MatrixGraph::SortbyDegree(vector<int> &AllDegree){
        } 
 		   return B;
 }     
-//Get the set of free colours, which used but not present in neighbor of x
-vector<int>
-MatrixGraph::getFreeColours(int x){
-	
-	          vector<int> U;
-			  vector<int> Used;
-			  int count=0;
+
+void
+MatrixGraph::getFreeColours(int x, set<int> &U){
+	          int count=0;
+			  set<int> UsedinNeighbour;
 			  for(int k=0;k<getSize();k++){
 				  if(colours_[k]!=0){
-                    Used.push_back(colours_[k]);
+				     U.insert(colours_[k]); 
+				  }
+				  if((colours_[k]!=0) && isNeighbours(k,x)==1 ){
+					 UsedinNeighbour.insert(colours_[k]);
 				  }
 			  }
-
-			  sort(Used.begin(),Used.end());
-	          cout<<"Used Colors:"<<endl;
-	          for(int i=0;i<(int)Used.size();i++){
-	              cout<<Used[i]<<" ";
-	          }
-			  cout<<endl;
-
-	          for(int i=0;i<(int)Used.size()-1;i++){
-		        if(Used[i]!=Used[i+1]){
-			            count++;
-		        }
-	          }
-	                count=count+1;
-					cout<<"count:"<<count<<endl;;
-					 Used.clear();
-		     for(int k=1;k<count+2;k++){
-			    for(int j=0;j<getSize();j++){
-				    if(colours_[j]==k && isNeighbours(j,x)){
-						Used.push_back(k);//used in the neighbour of x
-						//cout<<"vertex#"<<j<<" color# "<<k<<endl;
-					    
-					}
-
-		       }
               
-		  }
-          
-          for(int k=1;k<=count+1;k++){
-			    U.push_back(k);
-		  }
-		  cout<<"Origin U set is:"<<endl;
-	      for(int i=0;i<(int)U.size();i++){
-	           cout<<U[i]<<" ";
-	      }
-	      cout<<endl;
-
-		  vector<int> ::iterator iter;
-		  for(int i=0;i<(int)Used.size();i++){
-			   for(iter=U.begin();iter!=U.end();){
-				   if(Used[i]==*iter){
-					   iter=U.erase(iter);
-				   }
-		           else{ 
-						++iter;
-				   }
-				  		   
-			   }
-		  }
-		  sort(U.begin(),U.end());
-			   return U;
+			  set<int>::iterator iter;
+			  if(U.size()>0){
+			      iter=U.end();
+			      U.insert(*(--iter)+1);
+				  if(UsedinNeighbour.size()>0){
+                    for(iter=UsedinNeighbour.begin();iter!=UsedinNeighbour.end();iter++){
+                         U.erase(U.find(*iter));
+                    }
+				  }
+				  else{;}
+			  }
+			  else{
+				  U.insert(1);
+			  }
 }
+
 //Get the degree of saturation  vertex x
 int
 MatrixGraph::getVertexDSATUR(int x){
