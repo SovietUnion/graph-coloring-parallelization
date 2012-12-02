@@ -2,11 +2,10 @@
 
 using namespace std;
 
-ContractAlgorithm::ContractAlgorithm(Graph* g, int threadcount) {
+ContractAlgorithm::ContractAlgorithm(Graph* g) {
     g_ = g;
     // reset colours array
     g_->resetColours();
-    threadcount_=threadcount;
 }
 
 // Print out the results
