@@ -17,7 +17,7 @@ void
 ParallelContractAlgorithm::printResults() {
     unsigned int *colour = g_->getColours();
     for (int i = 0; i < g_->getSize(); i++) {
-        cout << "vertex " << i << " colour: " << (colour[i]) << endl;
+        cout << i << " " << (colour[i]) << endl;
     }
 }
 
@@ -25,7 +25,6 @@ ParallelContractAlgorithm::printResults() {
 //**** NEED TO MODIFY THE GRAPH TO TAKE SLICE & THREAD INTO ACCOUNT
 void*
 ParallelContractAlgorithm::colourSubGraph(void* slice) {
-    cout<<(long)slice<<endl;
     int slice_ = (int)((long)slice);
     int size = g_->getSize();
     int from = (slice_ * size)/threadcount_;	
@@ -36,7 +35,7 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
     
     // Update the size of slice(note: "to: is upper bound but exclusive)
     size = to-from;
-    cout<<"slice no: "<<slice_<<" from: " <<from<<" to:" << to<<endl;
+    //cout<<"slice no: "<<slice_<<" from: " <<from<<" to:" << to<<endl;
     while ( size > 0) {
         // determine a vertex x of maximal degree in G
         int x = g_->getMaxDegreeVertex(from, to);
@@ -258,7 +257,6 @@ ParallelContractAlgorithm::colourGraph() {
          }
 
        }
-       cout << endl;
     }
 
 

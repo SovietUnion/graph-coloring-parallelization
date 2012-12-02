@@ -13,7 +13,7 @@ void
 ContractAlgorithm::printResults() {
     unsigned int *colour = g_->getColours();
     for (int i = 0; i < g_->getSize(); i++) {
-        cout << "vertex " << i << " colour: " << (colour[i]) << endl;
+        cout << i << " " << (colour[i]) << endl;
     }
 }
 
