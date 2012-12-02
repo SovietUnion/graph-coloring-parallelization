@@ -1,5 +1,7 @@
 #include "MatrixGraph2.h"
 #include<vector>
+#include<set>
+
 #include<algorithm>
 using namespace std;
 
@@ -79,7 +81,8 @@ MatrixGraph::getNeighbours(int a) {
 
 //Get all the degrees
 
-vector<int> MatrixGraph::getAllDegree(vector<int> &AllDegree){
+vector<int> 
+MatrixGraph::getAllDegree(vector<int> &AllDegree){
 	   vector<int> B;
        for(int i=0;i<getSize();i++){
        B.push_back(i);
@@ -89,7 +92,8 @@ vector<int> MatrixGraph::getAllDegree(vector<int> &AllDegree){
 }  
 //Sort the vertices according to non-increasing degrees
 
-vector<int> MatrixGraph::SortbyDegree(vector<int> &AllDegree){
+vector<int> 
+MatrixGraph::SortbyDegree(vector<int> &AllDegree){
 	       vector<int> B;
 		   B=getAllDegree(AllDegree);
            int temp;
@@ -101,8 +105,43 @@ vector<int> MatrixGraph::SortbyDegree(vector<int> &AllDegree){
            }
        } 
 		   return B;
-}     
+}   
 
+//Maintain a sequence of vertex by non-increasing DSATUR
+void
+MatrixGraph::SortbyDSATUR(vector<int> &B){
+	       int temp;
+		   for(int i=0;i<(getSize()-1);i++){
+           if(getVertexDSATUR(B[i])<getVertexDSATUR(B[i+1])){
+              temp=B[i];
+              B[i]=B[i+1];
+              B[i+1]=temp;
+           }
+       } 
+}
+/*
+
+//Get colors(i)
+int
+MatrixGraph::colors(int i,vector<int> &B){
+	 vector<int> Used;
+			  int count=0;
+			  for(int k=0;k<getSize();k++){
+				  if(colours_[k]!=0){
+                    Used.push_back(colours_[k]);
+				  }
+			  }
+
+			 
+	          for(int i=0;i<(int)Used.size()-1;i++){
+		        if(Used[i]!=Used[i+1]){
+			            count++;
+		        }
+	          }
+	                count=count+1;
+}
+*/
+//Get the set of free colours, which used but not present in neighbor of x
 void
 MatrixGraph::getFreeColours(int x, set<int> &U){
 	          int count=0;
@@ -131,7 +170,6 @@ MatrixGraph::getFreeColours(int x, set<int> &U){
 				  U.insert(1);
 			  }
 }
-
 //Get the degree of saturation  vertex x
 int
 MatrixGraph::getVertexDSATUR(int x){
@@ -154,6 +192,7 @@ MatrixGraph::getVertexDSATUR(int x){
 	    count=count+1;
 		return count;
 }
+
 //Get the vertex with maximum degree of saturation
 int
 MatrixGraph::getMaxDSATURvertex(vector<int> &A){
@@ -229,5 +268,4 @@ int
 MatrixGraph::getColour(int x) {
 	return colours_[x];
 }
-
 
