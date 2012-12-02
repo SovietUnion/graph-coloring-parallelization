@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 
      while ( graph.good() ) {
        getline ( graph, line );
-       stringstream ss(line,stringstream::out);
+       stringstream ss(line);
        int a,b;
        
        // Read in the node      

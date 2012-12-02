@@ -37,14 +37,14 @@ public:
 };
 
 int timeColour(Algorithm* a) {
-    TimedSection t("timeColour");
+    TimedSection t("Colouring Time Elapsed:");
 
     int numColors = a->colourGraph();
     return numColors;
 }
 
 void printUsage(char* pname) {
-    printf("USAGE: %s [input_file] [-c|-pc|-b|-pb] [THREAD_NUMBER] \n", pname);
+    printf("USAGE: %s [GRAPH_FILE_NAME] [-c|-pc|-b|-pb] [THREAD_NUMBER] \n", pname);
     printf("-c:   Contraction algorithm\n");
     printf("-pc:  Parallel contraction algorithm\n");
     printf("-b:   Backtracking algorithm\n");
@@ -56,7 +56,7 @@ void printUsage(char* pname) {
 // Second Input: the name of the algorithm implementation  
 // Third Input: the number of thread
 // Output: Output the graph colouring to console
-//         Std err will give the time
+//         Std err will give the time, and number of colours used
 
 int main(int argc, char* argv[]) {
     if (argv[1] == NULL || argv[2] == NULL) {
@@ -113,10 +113,10 @@ int main(int argc, char* argv[]) {
     // Run algorithm based on option argument
     if (strcmp(option_str, "-c") == 0) {
         algo = new ContractAlgorithm(g);
-        cout<<"Colouring graph using \"Sequential contraction algorithm." << endl;        
+        cerr<<"Colouring graph using \"Sequential contraction algorithm." << endl;        
     } else if (strcmp(option_str, "-pc") == 0) {
         algo = new ParallelContractAlgorithm(g, thread_no);
-        cout<<"Colouring graph using \"Parallel contraction algorithm\" with " << thread_no << " thread(s)." << endl;
+        cerr<<"Colouring graph using \"Parallel contraction algorithm\" with " << thread_no << " thread(s)." << endl;
     } else if (strcmp(option_str, "-b") == 0) {
         //a = new BSCAlgorithm(g);
     } else if (strcmp(option_str, "-pb") == 0) {
@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
         return 16;
     }
     
-    cout<<"Number of colours used: "<<timeColour(algo) << endl;
+    cerr<<"Number of colours used: "<<timeColour(algo) << endl;
     algo->printResults();
 
     delete g;
