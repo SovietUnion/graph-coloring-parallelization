@@ -1,0 +1,12 @@
+#!/bin/bash
+
+mkdir -p Output/$1
+
+ls Input/$1 | while read line
+do
+  ./colour_graph Input/$1/$line $2 $3 > Output/$1/$line.out
+  ./Graph_Checker/graphchecker Input/$1/$line Output/$1/$line.out >> Output/$1/$line.out
+  if [ "$?" -eq "1" ] ; then
+    break;
+  fi;
+done 2> Output/$1/$1.summary
