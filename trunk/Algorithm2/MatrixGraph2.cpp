@@ -94,30 +94,39 @@ MatrixGraph::getAllDegree(vector<int> &AllDegree){
 
 vector<int> 
 MatrixGraph::SortbyDegree(vector<int> &AllDegree){
-	       vector<int> B;
-		   B=getAllDegree(AllDegree);
-           int temp;
-		   for(int i=0;i<(getSize()-1);i++){
-           if(AllDegree[B[i]]<AllDegree[B[i+1]]){
-              temp=B[i];
-              B[i]=B[i+1];
-              B[i+1]=temp;
+	     vector<int> B;
+		 B=getAllDegree(AllDegree);
+         int temp;
+		 for(int i=getSize();i>0;i--){
+		   for(int j=0;j<i-1;j++){
+              if(AllDegree[B[j]]<AllDegree[B[j+1]]){
+                 temp=B[j];
+                 B[j]=B[j+1];
+                 B[j+1]=temp;
+             }
            }
-       } 
-		   return B;
+		 }
+		 return B;
 }   
 
 //Maintain a sequence of vertex by non-increasing DSATUR
 void
 MatrixGraph::SortbyDSATUR(vector<int> &B){
+	   
 	       int temp;
-		   for(int i=0;i<(getSize()-1);i++){
-           if(getVertexDSATUR(B[i])<getVertexDSATUR(B[i+1])){
-              temp=B[i];
-              B[i]=B[i+1];
-              B[i+1]=temp;
-           }
-       } 
+		   int k=0;
+		   while(colours_[B[k]]!=0){
+			   k++;
+		   }
+		   for(int i=getSize()-k;i>0;i--){
+		    for(int j=k;j<i-1;j++){
+              if(getVertexDSATUR(B[j])<getVertexDSATUR(B[j+1]) ){
+               temp=B[j];
+               B[j]=B[j+1];
+               B[j+1]=temp;
+              }
+            } 
+		  }
 }
 /*
 
@@ -141,6 +150,17 @@ MatrixGraph::colors(int i,vector<int> &B){
 	                count=count+1;
 }
 */
+//Swap the element in a vector.
+void
+MatrixGraph::swap(int a, int b, vector<int> &A){
+	vector<int>::iterator ita;
+	vector<int>::iterator itb;
+	int temp;
+	
+	temp=*ita;
+	*ita=*itb;
+	*itb=temp;
+}
 
 
 //Get the set of free colours, which used but not present in neighbor of x
@@ -205,10 +225,8 @@ MatrixGraph::getMaxDSATURvertex(vector<int> &A){
 	//Using A[i] to index the vertex is to return vertex according to sequence in A[i] when MaxDSATURvertexs are more than one.
 	for(m=0;m<getSize();m++){
 		if(colours_[A[m]]==0 && getVertexDSATUR(A[m])>MaxDSATUR ){
-	    
-
-         MaxDSATUR=getVertexDSATUR(m);
-		 MaxDSATURvertex=A[m];
+          MaxDSATUR=getVertexDSATUR(m);
+		  MaxDSATURvertex=A[m];
 		}		
 	}
 	return MaxDSATURvertex;
@@ -248,9 +266,10 @@ MatrixGraph::removeColour(int k,set<int> &U){
 	set<int> ::iterator it;
 	it=U.begin();
 	it=U.erase(it);
-*/
-	U.erase(U.find(k));
-/* 
+*/  set<int> ::iterator it;
+    it=U.find(k);
+	it=U.erase(it);	
+/*  
 	for(it=U.begin();it!=U.end();){
 					if(k==*it){
 						 it=U.erase(it);
@@ -277,3 +296,4 @@ int
 MatrixGraph::getColour(int x) {
 	return colours_[x];
 }
+
