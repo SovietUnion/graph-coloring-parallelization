@@ -39,14 +39,20 @@ class MatrixGraph: public Graph {
     //Sort the vertices according to non-increasing degrees
     virtual vector<int> SortbyDegree(vector<int> &AllDegree);
 
+	//Maintain a sequence of vertex by non-decreasing DSATUR
+    virtual void SortbyDSATUR(vector<int> &B);
+
 	//Get the degree of saturation of vertex x
 	virtual int getVertexDSATUR(int x);
 
 	//Get the vertex with maximum degree of saturation
 	virtual int getMaxDSATURvertex(vector<int> &A);
-   
-   //Get the set of free colours, which used but not present in neighbor of x
-    virtual void getFreeColours(int x, set<int> &U);
+	 
+    //Get colors(i)
+	//virtual int colors(int i);
+
+    //Get the set of free colours, which used but not present in neighbor of x
+    virtual void getFreeColours(int x,set<int> &U);
    
     //Get the number of used colour
     virtual int getUsedColourNum(int i,vector<int> &U);
@@ -55,9 +61,9 @@ class MatrixGraph: public Graph {
 	virtual int getMax(int a, int b);
    
     //Remove colour k
-    virtual void removeColour(int k,vector<int> &U);
+    virtual void removeColour(int k,set<int> &U);
    
-    //Sort the set of colour(referred as U) according to non-decreasing order
+    //Sort the set of colour(referred as U) according to non-increasing order
     virtual void sortU(vector<int> &U);
    
     //Uncolour a vertex
