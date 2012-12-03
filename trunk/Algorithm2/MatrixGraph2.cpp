@@ -141,6 +141,8 @@ MatrixGraph::colors(int i,vector<int> &B){
 	                count=count+1;
 }
 */
+
+
 //Get the set of free colours, which used but not present in neighbor of x
 void
 MatrixGraph::getFreeColours(int x, set<int> &U){
@@ -241,8 +243,14 @@ MatrixGraph::getMax(int a,int b){
 }
 //Remove colour k
 void
-MatrixGraph::removeColour(int k,vector<int> &U){
-	vector<int> ::iterator it;
+MatrixGraph::removeColour(int k,set<int> &U){
+/*	
+	set<int> ::iterator it;
+	it=U.begin();
+	it=U.erase(it);
+*/
+	U.erase(U.find(k));
+/* 
 	for(it=U.begin();it!=U.end();){
 					if(k==*it){
 						 it=U.erase(it);
@@ -252,6 +260,7 @@ MatrixGraph::removeColour(int k,vector<int> &U){
 						++it;
 					}
     }
+*/
 }
 //Sort the set of colour(U) according to non-decreasing order
 void
@@ -268,4 +277,3 @@ int
 MatrixGraph::getColour(int x) {
 	return colours_[x];
 }
-
