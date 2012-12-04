@@ -144,6 +144,7 @@ BSCAlgorithm::colourGraph(){
          if(start>=0){
             //cout<<"start2: "<<start<<endl;
             x=A[start];  //new starting vertex
+            U[start].erase(U[start].find(g_->getColour(x)));
             g_->unColour(x);//uncolour x
 		//	g_->getFreeColours(A[start],U[i]);
          }
