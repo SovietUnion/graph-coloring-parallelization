@@ -156,15 +156,16 @@ BSCAlgorithm::colourGraph(){
             x=A[start];  //new starting vertex
 			//U[start].erase(U[start].find(g_->getColour(x)));
 			g_->unColour(x);//uncolour x
-		    g_->getFreeColours(A[start],U[i]);
+		    //g_->getFreeColours(A[start],U[start]);
          }
         }
 	  
 	    else{ //in this case the above for-loop has been passed without a break
-         Fopt=k; //storing the currently optimal colour number
+         Fopt=colors[g_->getSize()]; //storing the currently optimal colour number
 		 for(int n=0;n<g_->getSize();n++){//storing the currently optimal colouring
 			 OptColour[n]=g_->getColour(n);
 		 }
+
          optColourNum=colors[g_->getSize()];
 		 cout<<"optColourNum="<<optColourNum<<endl;
 		 int least; 
@@ -189,7 +190,7 @@ BSCAlgorithm::colourGraph(){
 		 int i;
          for( i=0;i<=start;i++){
            x=A[i];
-          // g_->getFreeColours(A[i],U[i]);		 
+         //g_->getFreeColours(A[i],U[i]);		 
 		   set<int>::iterator it;
 		   for(it=U[i].begin();it!=U[i].end();){//remove from U all colours>=optColourNumber;
                if(*it>=optColourNum){
@@ -201,11 +202,12 @@ BSCAlgorithm::colourGraph(){
            }//the current colouring is to be improved
          }//for loop
 		   cout<<"last start="<<start<<" i="<<i<<endl;
-	      // x=A[i];
-	      // g_->getFreeColours(A[start],U[start]); 
+		  //notice: here we have x = A[start]; U = freeColors(x)
+	      //x=A[i];
+	      //g_->getFreeColours(A[start],U[start]); 
 		  
 	    }//else branch 
-		    
+		    /*
 		    //Check before loop back
 		    cout<<"A[start] before break: "<<A[start]<<endl;
 		    cout<<"x before break: "<<x<<endl;
@@ -218,7 +220,7 @@ BSCAlgorithm::colourGraph(){
 		    cout<<endl;
 			
 	        break;
-			
+			*/
      }//while loop 
          
           for(int i=0;i<g_->getSize();i++){
@@ -281,11 +283,12 @@ void main() {
     g->addNeighbour(1, 6);
     g->addNeighbour(2, 3);
     g->addNeighbour(2, 4);
-  //  g->addNeighbour(2, 5);
-   // g->addNeighbour(3, 5);
+    g->addNeighbour(2, 5);
+    g->addNeighbour(3, 5);
    // g->addNeighbour(3, 6);
    // g->addNeighbour(4, 6);
-   // g->addNeighbour(5, 6);
+  //  g->addNeighbour(5, 6);
+  
     Algorithm *a = new BSCAlgorithm(g);
  
 
