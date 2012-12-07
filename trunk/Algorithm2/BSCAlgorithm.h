@@ -2,7 +2,7 @@
 #ifndef BSCALGORITHM_H
 #define BSCALGORITHM_H
 
-#include "Algorithm2.h"
+#include"Algorithm2.h"
 using namespace std;
 
 class BSCAlgorithm : public Algorithm{
