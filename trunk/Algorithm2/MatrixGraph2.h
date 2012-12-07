@@ -17,6 +17,9 @@ class MatrixGraph: public Graph {
 
     // Get the vertex degree
     virtual int getDegree(int vertex);
+
+	//Get the vertex with MAX degree
+	virtual int getMaxDegreeVertex();
    
     // Get the vertex count in G
     virtual int getSize();
@@ -31,25 +34,13 @@ class MatrixGraph: public Graph {
     friend std::ostream& operator<<(ostream &os, const MatrixGraph &g);
 
 	//Print out graph
-	virtual void printGraph();
-   
-    //Get all the degrees
-    virtual vector<int> getAllDegree(vector<int> &AllDegree);
-   
-    //Sort the vertices according to non-increasing degrees
-    virtual vector<int> SortbyDegree(vector<int> &AllDegree);
+	virtual void printGraph();;
 
-	//Maintain a sequence of vertex by non-decreasing DSATUR
-    virtual void SortbyDSATUR(vector<int> &B);
+	//Decide which vertex to color next
+    virtual void getNextVertex(vector<int> &A,vector<pair <int,int>> &B);
 
 	//Get the degree of saturation of vertex x
 	virtual int getVertexDSATUR(int x);
-
-	//Get the vertex with maximum degree of saturation
-	virtual int getMaxDSATURvertex(vector<int> &A);
-
-	//Swap the element in a vector.
-  virtual void swap(int a, int b, vector<int> &A);
 
     //Get the set of free colours, which used but not present in neighbor of x
     virtual void getFreeColours(int x,set<int> &U);
@@ -62,9 +53,6 @@ class MatrixGraph: public Graph {
    
     //Remove colour k
     virtual void removeColour(int k,set<int> &U);
-   
-    //Sort the set of colour(referred as U) according to non-increasing order
-    virtual void sortU(vector<int> &U);
    
     //Uncolour a vertex
     virtual void unColour(int x);
