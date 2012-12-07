@@ -1,7 +1,8 @@
 #include "MatrixGraph2.h"
 #include<vector>
 #include<set>
-
+#include <stdlib.h>
+#include<utility>
 #include<algorithm>
 using namespace std;
 
@@ -13,8 +14,13 @@ MatrixGraph::MatrixGraph(const vector<vector<bool> > &g, int mSize) {
     size = mSize;
     graph = g;
     colours_ = new int[mSize];
+	degrees_ = new int[mSize];
+	for(int i=0;i<mSize;i++){
+		degrees_[i]=0;
+	}
 }
 
+//Judge if two vertex are neighbour to each other
 bool
 MatrixGraph::isNeighbours(int a, int b) {
     if (a >= size || b >= size || a < 0 || b < 0) {
@@ -23,38 +29,55 @@ MatrixGraph::isNeighbours(int a, int b) {
     return (graph[a][b] == 1 && graph[b][a] == 1);
 }
 
+//add a neighbour when constructing a graph
 void
 MatrixGraph::addNeighbour(int a, int b) {
     graph[a][b] = graph[b][a] = 1;
+	degrees_[a]++;
+    degrees_[b]++;
 }
 
+//Get the degree of the vertex
 int
 MatrixGraph::getDegree(int vertex) {
-    int count = 0;
-    for (int i = 0; i < size; i++) {
-        if (graph[vertex][i] == 1) {
-            count++;
-        }
-    }
-    return count;
+    return degrees_[vertex];
 }
 
+//Get the vertex with MAX degree
+int
+MatrixGraph::getMaxDegreeVertex() {
+    int maxDegree = -1;
+    int maxVertex = 0;
+    int tempDegree = 0;
+    for (int i = 0; i < size; i++) {
+        if (colours_[i] == 0 && (tempDegree = degrees_[i]) > maxDegree) {
+            maxDegree = tempDegree;
+            maxVertex = i;
+        }
+    }
+    return maxVertex;
+
+}
+
+//Get the size of the graph
 int
 MatrixGraph::getSize() {
     return size;
 }
 
+//Color a vertex v with a colour
 void
 MatrixGraph::setColour(int v, int colour) {
     colours_[v] = colour;
 }
 
+//Get the current colouring
 int *
 MatrixGraph::getColours() {
-
     return colours_;
 }
 
+//Print the Graph
 void 
 MatrixGraph::printGraph() {
  for(int i=0;i<getSize();i++){
@@ -65,6 +88,7 @@ MatrixGraph::printGraph() {
 	}
 }
 
+//Get the neighbours of a vertex
 vector<int>
 MatrixGraph::getNeighbours(int a) {
 	vector<int> neighbours;
@@ -79,68 +103,19 @@ MatrixGraph::getNeighbours(int a) {
 	return neighbours;
 }
 
-//Get all the degrees
-
-vector<int> 
-MatrixGraph::getAllDegree(vector<int> &AllDegree){
-	   vector<int> B;
-       for(int i=0;i<getSize();i++){
-       B.push_back(i);
-       AllDegree.push_back(getDegree(i));
-       } 
-	   return B;
-}  
-
-//Sort the vertices according to non-increasing degrees
-vector<int> 
-MatrixGraph::SortbyDegree(vector<int> &AllDegree){
-	     vector<int> B;
-		 B=getAllDegree(AllDegree);
-         int temp;
-		 for(int i=getSize();i>0;i--){
-		   for(int j=0;j<i-1;j++){
-              if(AllDegree[B[j]]<AllDegree[B[j+1]]){
-                 temp=B[j];
-                 B[j]=B[j+1];
-                 B[j+1]=temp;
-             }
-           }
-		 }
-		 return B;
-}   
-
-//Maintain a sequence of vertex by non-increasing DSATUR
+//Decide which vertex to color next
 void
-MatrixGraph::SortbyDSATUR(vector<int> &B){
-	   
-	       int temp;
-		   int k=0;
-		   while(colours_[B[k]]!=0){
-			   k++;
-		   }
-		   for(int i=getSize()-k;i>0;i--){
-		    for(int j=k;j<i-1;j++){
-              if(getVertexDSATUR(B[j])<getVertexDSATUR(B[j+1]) ){
-               temp=B[j];
-               B[j]=B[j+1];
-               B[j+1]=temp;
-              }
-            } 
-		  }
+MatrixGraph::getNextVertex(vector<int> &A,vector<pair <int,int>> &B){
+	for(int k=0;k<(int)B.size();k++){
+		if(isNeighbours(A.back(),B[k].second)==1){
+		  B[k].first=getVertexDSATUR(B[k].second);
+		}
+	}
+	make_heap(B.begin(),B.end());
+	A.push_back(B[0].second);
+	pop_heap(B.begin(),B.end());
+	B.pop_back();
 }
-
-//Swap the element in a vector.
-void
-MatrixGraph::swap(int a, int b, vector<int> &A){
-	vector<int>::iterator ita;
-	vector<int>::iterator itb;
-	int temp;
-	
-	temp=*ita;
-	*ita=*itb;
-	*itb=temp;
-}
-
 
 //Get the set of free colours, which used but not present in neighbor of x
 void
@@ -171,7 +146,6 @@ MatrixGraph::getFreeColours(int x, set<int> &U){
 				  U.insert(1);
 			  }
 }
-
 //Get the degree of saturation  vertex x
 int
 MatrixGraph::getVertexDSATUR(int x){
@@ -186,24 +160,7 @@ MatrixGraph::getVertexDSATUR(int x){
 	}
 		return adjacentColor.size();
 }
-
-//Get the vertex with maximum degree of saturation
-int
-MatrixGraph::getMaxDSATURvertex(vector<int> &A){
-	//Scan all the vertex to find a uncolored vertex with the Max degree of saturation
-	int MaxDSATUR=0;
-	int MaxDSATURvertex=0;
-	int m;
-	//Using A[i] to index the vertex is to return vertex according to sequence in A[i] when MaxDSATURvertexs are more than one.
-	for(m=0;m<getSize();m++){
-		if(colours_[A[m]]==0 && getVertexDSATUR(A[m])>MaxDSATUR ){
-          MaxDSATUR=getVertexDSATUR(m);
-		  MaxDSATURvertex=A[m];
-		}		
-	}
-	return MaxDSATURvertex;
-}
-                  
+                 
 //Get the number of used colour
 int 
 MatrixGraph::getUsedColourNum(int i,vector<int> &U){
@@ -234,35 +191,17 @@ MatrixGraph::getMax(int a,int b){
 //Remove colour k
 void
 MatrixGraph::removeColour(int k,set<int> &U){
-/*	
-	set<int> ::iterator it;
-	it=U.begin();
-	it=U.erase(it);
-*/  set<int> ::iterator it;
+    set<int> ::iterator it;
     it=U.find(k);
 	it=U.erase(it);	
-/*  
-	for(it=U.begin();it!=U.end();){
-					if(k==*it){
-						 it=U.erase(it);
-					}
-                   			
-					else{ 
-						++it;
-					}
-    }
-*/
 }
-//Sort the set of colour(U) according to non-decreasing order
-void
-MatrixGraph::sortU(vector<int> &U){
-   sort(U.begin(),U.end());
-}
+
 //Uncolour a vertex
 void
 MatrixGraph::unColour(int x){
    colours_[x]=0;
 }
+
 //Get the colour of vertex with index x
 int 
 MatrixGraph::getColour(int x) {
