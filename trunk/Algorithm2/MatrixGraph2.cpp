@@ -90,8 +90,8 @@ MatrixGraph::getAllDegree(vector<int> &AllDegree){
        } 
 	   return B;
 }  
-//Sort the vertices according to non-increasing degrees
 
+//Sort the vertices according to non-increasing degrees
 vector<int> 
 MatrixGraph::SortbyDegree(vector<int> &AllDegree){
 	     vector<int> B;
@@ -192,27 +192,20 @@ MatrixGraph::getFreeColours(int x, set<int> &U){
 				  U.insert(1);
 			  }
 }
+
 //Get the degree of saturation  vertex x
 int
 MatrixGraph::getVertexDSATUR(int x){
 	vector<int> neighbours;
 	neighbours=getNeighbours(x);
-	//Count the number of colours around x
-	int count=0;
-	vector<int> adjacentColor;
+	
+	set<int> adjacentColor;
 	for(int i=0;i<(int)neighbours.size();i++){
-	 adjacentColor.push_back(colours_[neighbours[i]]);
-	}
-	
-	sort(adjacentColor.begin(),adjacentColor.end());
-	
-	for(int i=0;i<(int)adjacentColor.size()-1;i++){
-		if(adjacentColor[i]!=adjacentColor[i+1] && adjacentColor[i]!=0){
-			count++;
+		if(colours_[neighbours[i]]!=0){
+			adjacentColor.insert(colours_[neighbours[i]]);
 		}
 	}
-	    count=count+1;
-		return count;
+		return adjacentColor.size();
 }
 
 //Get the vertex with maximum degree of saturation
