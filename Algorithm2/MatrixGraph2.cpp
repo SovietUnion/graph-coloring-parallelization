@@ -128,28 +128,7 @@ MatrixGraph::SortbyDSATUR(vector<int> &B){
             } 
 		  }
 }
-/*
 
-//Get colors(i)
-int
-MatrixGraph::colors(int i,vector<int> &B){
-	 vector<int> Used;
-			  int count=0;
-			  for(int k=0;k<getSize();k++){
-				  if(colours_[k]!=0){
-                    Used.push_back(colours_[k]);
-				  }
-			  }
-
-			 
-	          for(int i=0;i<(int)Used.size()-1;i++){
-		        if(Used[i]!=Used[i+1]){
-			            count++;
-		        }
-	          }
-	                count=count+1;
-}
-*/
 //Swap the element in a vector.
 void
 MatrixGraph::swap(int a, int b, vector<int> &A){
