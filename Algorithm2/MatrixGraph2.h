@@ -47,12 +47,9 @@ class MatrixGraph: public Graph {
 
 	//Get the vertex with maximum degree of saturation
 	virtual int getMaxDSATURvertex(vector<int> &A);
-	 
-    //Get colors(i)
-	//virtual int colors(int i);
 
 	//Swap the element in a vector.
-    virtual void swap(int a, int b, vector<int> &A);
+  virtual void swap(int a, int b, vector<int> &A);
 
     //Get the set of free colours, which used but not present in neighbor of x
     virtual void getFreeColours(int x,set<int> &U);
