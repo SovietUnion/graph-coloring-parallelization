@@ -13,7 +13,7 @@ protected:
    int * degrees_;
 
 public:
-	// Return true if a and b are neighbours
+	  // Return true if a and b are neighbours
     virtual bool isNeighbours(int a, int b) = 0;
    
     // Add an edge between a and b
@@ -23,7 +23,7 @@ public:
     virtual int getDegree(int vertex) = 0;
 
     //Get the vertex with MAX degree
-	virtual int getMaxDegreeVertex()=0;
+	  virtual int getMaxDegreeVertex()=0;
 
     // Get the vertex count in G
     virtual int getSize() = 0;
@@ -34,17 +34,17 @@ public:
     // get colors of graph
     virtual int* getColours() = 0;
 
-	//Print out graph
-	virtual void printGraph()= 0;
+	  //Print out graph
+	  virtual void printGraph()= 0;
 
-	// Return an vector containing the neighbours of a
+	  // Return an vector containing the neighbours of a
     virtual vector<int> getNeighbours(int a)= 0;
 
-	//Decide which vertex to color next
+	  //Decide which vertex to color next
     virtual void getNextVertex(vector<int> &A,vector<pair <int,int>> &B)=0;
 
-	//Get the degree of saturation of vertex x
-	virtual int getVertexDSATUR(int x)=0;
+	  //Get the degree of saturation of vertex x
+	  virtual int getVertexDSATUR(int x)=0;
    
     //Get the set of free colours, which used but not present in neighbor of x
     virtual void getFreeColours(int x,set<int> &U)=0;
@@ -52,8 +52,8 @@ public:
     //Get the number of used colour
     virtual int getUsedColourNum(int i,vector<int> &U)= 0;
 
-	//Get the larger one of two inputs
-	virtual int getMax(int a, int b)= 0;
+	  //Get the larger one of two inputs
+	  virtual int getMax(int a, int b)= 0;
    
     //Remove colour k
     virtual void removeColour(int k,set<int> &U)= 0;
