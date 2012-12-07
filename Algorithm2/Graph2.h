@@ -51,9 +51,6 @@ public:
 	//Get the vertex with maximum degree of saturation
 	virtual int getMaxDSATURvertex(vector<int> &A)= 0;
 
-	//Get colors(i)
-	//virtual int colors(int i)=0;
-
 	//Swap the element in a vector.
     virtual void swap(int a, int b, vector<int> &A)=0;
    
