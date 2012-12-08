@@ -40,40 +40,58 @@ BSCAlgorithm::colourGraph(){
     int Fopt=0;//Optimal colour number
     int start=0;//Starting index
     int optColourNum=g_->getSize()+1;//Optimal number of colours
-    vector<int> A;//Set used to store the vertex index (in non-decreasing degree sequence)
-	vector<set<int>> U(g_->getSize());//
-	vector<set<int>> freeColors(g_->getSize());//Variable for the set(sequence) of free colours
-	vector<int> colors(g_->getSize()+1);//Number of used colours
+	int size=g_->getSize();
+    vector<int> A;//Set of coloured vertex
+	vector<set<int>> U(size);//
+	vector<set<int>> freeColors(size);//Variable for the set(sequence) of free colours
+	vector<int> colors(size+1);//Number of used colours
 	A.push_back(g_->getMaxDegreeVertex());//The first vertex to color is the MAX degree vertex
     int x=A[0];//Current vertex to be coloured 
     //int usedColourNum =g_->getUsedColourNum(-1,U);//Number of used colours 
-	vector<int> OptColour(g_->getSize());//Store the Colouring results
+	vector<int> OptColour(size);//Store the Colouring results
 
     bool back; 
 	int i=0;
 	U[i].insert(1);//Initialize the set of free colour with 1
 	freeColors[x]=U[i];
 
+	//a heap of uncoloured vertex
 	//Initializing B
-	vector<pair <int,int>> B(g_->getSize());
-	for(int i=1;i<g_->getSize();i++){
+	vector<pair <int,int>> B(size);
+	for(int i=0;i<size;i++){//Except x in B
 		B[i].first=g_->getVertexDSATUR(i);
 		B[i].second=i;
 	}
-	    make_heap(B.begin(),B.end());
+	
+	vector<pair <int,int>>::iterator itB;
+    for(itB=B.begin();itB!=B.end();){
+		if((*itB).second==x){itB=B.erase(itB);}
+	    else ++itB;
+	}
+
+    make_heap(B.begin(),B.end());
+
+    //remember A and B in each step
+	vector<vector<int>> AA(size,vector<int>(size));
+	vector<vector<pair<int,int>>> BB(size,vector<pair<int,int>>(size));
+
+	//Initialize AA & BB
+	AA[i]=A;
+	BB[i]=B;
 
     //Test the initialization before colouring
-	cout<<"OptColour: "<<endl;
-	for(int n=start;n<g_->getSize();n++){
+	cout<<"Test the initialization before colouring"<<endl;
+	cout<<"OptColour: ";
+	for(int n=start;n<size;n++){
 		cout<<OptColour[n]<<" ";
 	}
 	cout<<endl;
-	cout<<"A[i]:"<<endl;
+	cout<<"A[i]:";
     vector<int>::iterator itt;
 	set<int>::iterator it;
 	for(itt=A.begin();itt!=A.end();itt++){
 		 cout<<*itt<<" ";
-	 }
+	}
     cout<<endl;
 	cout<<"x:"<<x<<" "<<endl;
     cout<<"U[i]:";
@@ -81,20 +99,20 @@ BSCAlgorithm::colourGraph(){
 		 cout<<*it<<" ";
 	}
 	cout<<endl;
-	cout<<"*(U[0].begin())= "<<*(U[0].begin())<<endl;
 	cout<<"start="<<start<<endl;
-	cout<<"======================"<<endl;
+	cout<<"====Coloring Started===="<<endl;
 
 	while(start>=0){
        //x is coloured in the following for-loop. Backtracking is
        //necessary, if U =0; or if an improved colouring has been found
        back=false;//boolean variable for backtracking
-       for(i=start;i<g_->getSize();i++){
+       for(i=start;i<size;i++){
 	     if(i>start){
            g_->getNextVertex(A,B);
 		   x=A[i];
 		   g_->getFreeColours(x,U[i]);//get the set of free colours of x, the set U
-
+		   AA[i]=A;//Remember the sequence in each state
+		   BB[i]=B;//Remember the sequence in each state
 	       //Print A[i]
 		   cout<<"A[i]:"<<endl;
            vector<int>::iterator itt;
@@ -111,7 +129,7 @@ BSCAlgorithm::colourGraph(){
 
 		 if(U[i].size()>0){
 		   k=*(U[i].begin());       //selected free colour
-           g_->setColour(A[i],k);   // Set x with colour k
+           g_->setColour(x,k);   // Set x with colour k
            g_->removeColour(k,U[i]);//Remove k from U	
 		   freeColors[x]=U[i];
 		   int l=colors[i];
@@ -119,6 +137,8 @@ BSCAlgorithm::colourGraph(){
 
 		   //Print colors(i) 
 		   cout<<"colors("<<i<<")="<<colors[i+1]<<endl;
+		   //Print color used
+		   cout<<"vertex color: "<<k<<endl;
 		   //Print U
 		   set<int>::iterator it;
 		   cout<<"U(after remove): ";
@@ -145,10 +165,10 @@ BSCAlgorithm::colourGraph(){
 		}
 	        
 		else{//in this case the above for-loop has been passed without a break
-         Fopt=colors[g_->getSize()];//storing the currently optimal colour number
-		 for(int n=0;n<g_->getSize();n++){ OptColour[n]=g_->getColour(n);}//storing the currently optimal colouring			
+         Fopt=colors[size];//storing the currently optimal colour number
+		 for(int n=0;n<size;n++){ OptColour[n]=g_->getColour(n);}//storing the currently optimal colouring			
 
-         optColourNum=colors[g_->getSize()];
+         optColourNum=colors[size];
 		 cout<<"optColourNum="<<optColourNum<<endl;
 		 int least; 
          for(least=0;least<(int)A.size();least++){//i=least index with F(A[i]) = optColourNumber;
@@ -163,12 +183,12 @@ BSCAlgorithm::colourGraph(){
 		 
          if(start<0){break;}//leaving the while-loop
 
-		 for(int n=start;n<g_->getSize();n++){g_->unColour(A[n]);} //uncolour all vertices A[i] with y>=start;
+		 for(int n=start;n<size;n++){g_->unColour(A[n]);} //uncolour all vertices A[i] with y>=start;
            
 		 int m;
          for( m=0;m<=start;m++){
            x=A[m];
-           U[m]=freeColors[x];
+           U[m]=freeColors[x];		  
 		   //remove from U all colours>=optColourNumber;
 		   set<int>::iterator it;
 		   for(it=U[m].begin();it!=U[m].end();){
@@ -178,9 +198,29 @@ BSCAlgorithm::colourGraph(){
 		   freeColors[x]=U[m];
          }//for loop
 		  //notice: here we have x = A[start]; U = freeColors(x)
+		  //A and B are re to the backtracking state
+		   A=AA[start];
+		   B=BB[start];
 	    }//else branch 
+		/*
+		cout<<"AA: "<<endl;
+		for(int i=0;i<size;i++){		
+			for(int j=0;j<(int)AA[i].size();j++){
+				cout<<AA[i][j]<<" ";
+			}
+			cout<<endl;
+		}
+		cout<<"BB: "<<endl;
+		for(int i=0;i<size;i++){		
+			for(int j=0;j<(int)BB[i].size();j++){
+				cout<<BB[i][j].second<<" ";
+			}
+			cout<<endl;
+		}
+		break;
+		*/
      }//while loop 
-          for(int i=0;i<g_->getSize();i++){g_->setColour(i,OptColour[i]);}
+          for(int i=0;i<size;i++){g_->setColour(i,OptColour[i]);}
           return Fopt;   
 }//BSCAlgorithm
 
@@ -203,7 +243,7 @@ void main() {
     5 1 1 1 1 0 0 0
     6 0 1 0 1 1 0 0
     */
-	
+	/*
     g->addNeighbour(0, 1);
     g->addNeighbour(0, 2);
     g->addNeighbour(0, 4);
@@ -217,13 +257,14 @@ void main() {
     g->addNeighbour(3, 5);
     g->addNeighbour(3, 6);
     g->addNeighbour(4, 6);
-    /*
+	*/
+
  // Make it complete graph K7,7
     g->addNeighbour(0, 3);
     g->addNeighbour(0, 6);
     g->addNeighbour(1, 2);
     g->addNeighbour(1, 4);
-    g->addNeighbour(2, 6);
+  //  g->addNeighbour(2, 6);
     g->addNeighbour(3, 4);
     g->addNeighbour(4, 5);
     g->addNeighbour(0, 1);
@@ -233,17 +274,18 @@ void main() {
     g->addNeighbour(1, 3);
     g->addNeighbour(1, 5);
     g->addNeighbour(1, 6);
-    g->addNeighbour(2, 3);
+   // g->addNeighbour(2, 3);
     g->addNeighbour(2, 4);
     g->addNeighbour(2, 5);
     g->addNeighbour(3, 5);
-    g->addNeighbour(3, 6);
+   // g->addNeighbour(3, 6);
     g->addNeighbour(4, 6);
     g->addNeighbour(5, 6);
-	*/   
+	
     Algorithm *a = new BSCAlgorithm(g);
    //run algorithm
-    cout<<"number of color: "<<a->colourGraph()<< endl;
+	
+    cout<<"Number of Color Used: "<<a->colourGraph()<< endl;
     a->printResults();
 	cout<<"Graph:  "<<endl;
 	g->printGraph();
