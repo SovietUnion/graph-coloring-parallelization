@@ -4,25 +4,18 @@
 
 using namespace std;
 
-Algorithm::Algorithm (int num_nodes, Graph* g) {
-
-  this->colours = new int[num_nodes];
-  this->num_of_nodes = num_nodes;
-  this->g = g;
-  // Initialize the colour to be 0 before colouring 
-  for(int i=0;i<num_nodes;i++){ 
-	  this->colours[i]=0;
-  }
-}
-
-Algorithm::~Algorithm {
-  delete [] colours;
+Algorithm::~Algorithm() {
 }
 
 // Print out the results
 void Algorithm::printResults() {
-  for (int i = 0; i < num_of_nodes; i++)
-    cout << i << " " << colours[i] << endl;
+    unsigned int *colour = g_->getColours();
+    for (int i = 0; i < g_->getSize(); i++) {
+        cout << i << " " << (colour[i]) << endl;
+    }
 }
 
-
+// Dummy
+int Algorithm::colourGraph() {
+  return 0;
+}

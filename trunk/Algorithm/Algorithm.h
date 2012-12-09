@@ -9,22 +9,19 @@ class Algorithm {
 protected:
     Graph* g_;
     int threadcount_;
-    int *colours;
-	  int num_of_nodes;
 
 public:
     //Constructor
-	  Algorithm(int num_nodes, Graph* g);
-	  Algorithm(){};
+    Algorithm(){};
      
     // Print out the results
-    virtual void printResults() = 0;
+    virtual void printResults();
 
     // Colour the graph G and return number of colours used
-    virtual int colourGraph() = 0;
+    virtual int colourGraph();
     
     //Destructor
-	  Algorithm::~Algorithm()
+    ~Algorithm();
 };
 
 #endif
