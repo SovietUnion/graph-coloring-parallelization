@@ -247,6 +247,17 @@ MatrixGraph::setColour(unsigned int* c) {
    colours_ = c;
 }
 
+void
+MatrixGraph::neighbours(int a, queue<unsigned int> &neighbours, int from) {
+    // Only find neighbours if vertex has positive degree
+    if (degrees_[a] > 0) {
+        for (int i = from; i < size; i++) {
+	    if (graph[a][i] == 1) {
+	    neighbours.push(i);
+	    }
+        }
+    }
+}
 ostream& 
 MatrixGraph::print(ostream &os) const
 {

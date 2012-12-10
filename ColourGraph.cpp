@@ -112,8 +112,8 @@ int main(int argc, char* argv[]) {
     }
 
 
-    cout << *g;
-    cout << g << endl;
+    //cerr << *g;
+    //cerr << g << endl;
 
     // Run algorithm based on option argument
     if (strcmp(option_str, "-c") == 0) {
