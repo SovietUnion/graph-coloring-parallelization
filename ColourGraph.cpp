@@ -6,6 +6,7 @@
 #include <string.h>
 #include "./Graph/Graph.h"
 #include "./Algorithm/Algorithm.h"
+#include "./Algorithm/BSCAlgorithm.h"
 #include "./Algorithm/ContractAlgorithm.h"
 #include "./Algorithm/ParallelContractAlgorithm.h"
 #include "./Graph/MatrixGraph.h"
@@ -110,6 +111,10 @@ int main(int argc, char* argv[]) {
         return 4;
     }
 
+
+    cout << *g;
+    cout << g << endl;
+
     // Run algorithm based on option argument
     if (strcmp(option_str, "-c") == 0) {
         algo = new ContractAlgorithm(g);
@@ -118,9 +123,10 @@ int main(int argc, char* argv[]) {
         algo = new ParallelContractAlgorithm(g, thread_no);
         cerr<<"Colouring graph using \"Parallel contraction algorithm\" with " << thread_no << " thread(s)." << endl;
     } else if (strcmp(option_str, "-b") == 0) {
-        //a = new BSCAlgorithm(g);
+        algo = new BSCAlgorithm(g);
+        cerr<<"Colouring graph using \"Sequential backtracking algorithm." << endl;        
     } else if (strcmp(option_str, "-pb") == 0) {
-        // a = new ParallelBCAlgorithm(g,thread_no);
+        // algo = new ParallelBCAlgorithm(g,thread_no);
     } else {
         printUsage(argv[0]);
         return 16;
