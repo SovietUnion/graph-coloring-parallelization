@@ -18,18 +18,18 @@ BSCAlgorithm::BSCAlgorithm(Graph* g) {
 int
 BSCAlgorithm::mergeHeap(SkewHeap* h, int a, int b) {
 
-  int root  = a;
+  int root = a;
   int addee = b;
 
   // Return if you are trying to merge the same node
   if (a == b) 
-    return a;
+    return maxInt; // force an error
 
-  // Take the larger one as root
   if (h[a].DSAT < h[b].DSAT) {
     root = b;
     addee = a;
-  } 
+  }
+
 
   if (h[root].right != maxInt) {
     addee = mergeHeap(h,h[root].right,addee);
@@ -94,7 +94,7 @@ BSCAlgorithm::update(int x, queue<int>& updates,
 
        // It is already in the queue if it has maxInt as parent
        if (h[n[i]].parent == notInQueue) {
-          // Add it onto the queue if it is not in the queue yet
+         // Add it onto the queue if it is not in the queue yet
          h[n[i]].parent = maxInt;
          updates.push(n[i]);
        } else if (h[n[i]].parent != maxInt) {
@@ -232,9 +232,9 @@ BSCAlgorithm::colourGraph(){
 
     A[0].x = root;
     A[0].U.insert(1);
-    heap[A[0].x].DSAT = g_->getDegree(A[0].x);
+    heap[A[0].x].DSAT = g_->getVertexDSATUR(A[0].x)*size + g_->getDegree(A[0].x);
     optColorNumber = g_->getDegree(A[0].x) + 1;
-   
+    //optColorNumber = size;
     while(start >= 0) {
 
       back = false;
@@ -249,7 +249,7 @@ BSCAlgorithm::colourGraph(){
 
            if (i > 0)
               c = A[i-1].colors;
-    
+
            // Find the node with the maximum degree of saturation
            root = mergeHeap(heap, pendingUpdates);
            popHeap(heap, root, pendingUpdates);
@@ -320,7 +320,7 @@ BSCAlgorithm::colourGraph(){
            break;      // optimal is found!
 
         // revert changes
-        for (int i = size-1; i > start; i--) {
+        for (int i = size-1; i >= start; i--) {
           colours[A[i].x] = 0;
           if (heap[A[i].x].parent == notInQueue) {
              heap[A[i].x].parent = maxInt;
