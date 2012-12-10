@@ -150,6 +150,7 @@ ParallelContractAlgorithm::detectConflict(void* arg) {
         g_->neighbours(i, n, i);
         //vector<unsigned int>::iterator it;
         while(!n.empty()){
+            
             int j = n.front();
             n.pop();
             if (colours[i] == colours[j] ) {
