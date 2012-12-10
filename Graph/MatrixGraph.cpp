@@ -128,7 +128,7 @@ MatrixGraph::contract(int a, int b) {
     for (int i = 0; i < size; i++) {
         if (graph[b][i] == 1) {
             graph[a][i] = 1;
-            degrees_[a]++;
+            //degrees_[a]++;
         }
     }
 }

@@ -47,20 +47,21 @@ int main(int argc, char* argv[]) {
 	
 
     // create N thread to run colour algorithm (later need to use command line arg)
-    N = 3;
+    N = 4;
 
     a = new ParallelContractAlgorithm(g, N);
     //print out the graph matrix
     cout<<*g;
 
     int k = a->colourGraph();
+        cout<<endl;
+    cout<<"graph after running contract algorithm\n"<<*g;
     cout << "number of colours used: " << k << endl;
 
     //run algorithm
     a->printResults();
 
-    cout<<endl;
-    cout<<"graph after running contract algorithm\n"<<*g;
+
     delete a;
     delete g;
 

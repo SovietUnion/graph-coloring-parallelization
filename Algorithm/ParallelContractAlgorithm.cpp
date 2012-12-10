@@ -29,7 +29,7 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
     int size = g_->getSize();
     int from = (slice_ * size)/threadcount_;	
     int to = ((slice_+1) * size)/threadcount_;
-    int colournumber = slice_;
+    int colournumber = 0;
     bool firstRun = true;
     bool secondRun = true;
     
@@ -41,14 +41,6 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
         int x = g_->getMaxDegreeVertex(from, to);
 
         // color x
-        if(firstRun) {
-             firstRun = false;
-        } else if (slice_ > 0 && secondRun) {
-             secondRun = false;
-             colournumber = 0;
-        } else if (slice_ > 0 && colournumber == slice_) {
-             colournumber++;
-        }
         colournumber++;
 
         g_->setColour(x, colournumber);
@@ -91,9 +83,6 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
         g_->restoreVertex(x,b);
         size--;
     }
-
-    if (slice_ + 1 >= colournumber)
-       colournumber = slice_ + 1;
 
     return (void*)colournumber;
 }
