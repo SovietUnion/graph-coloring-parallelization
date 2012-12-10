@@ -307,6 +307,7 @@ BSCAlgorithm::colourGraph(){
         for (int i = 0; i < size; i++)
            Fopt[i] = colours[i];
 
+        int prevOpt = optColorNumber;
         optColorNumber = A[size-1].colors;
 
         // Look for where to restart and remove unused colours of the freeColor set
