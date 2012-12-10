@@ -119,22 +119,19 @@ MatrixGraph::getNextVertex(vector<int> &A,vector<pair <int,int>> &B){
 
 //Get the set of free colours, which used but not present in neighbor of x
 void
-MatrixGraph::getFreeColours(int x, set<int> &U){
-	          int count=0;
+MatrixGraph::getFreeColours(int x, set<int> &U, int l){
+	          vector<int> neigh;
 			  set<int> UsedinNeighbour;
-			  for(int k=0;k<getSize();k++){
-				  if(colours_[k]!=0){
-				     U.insert(colours_[k]); 
-				  }
-				  if((colours_[k]!=0) && isNeighbours(k,x)==1 ){
-					 UsedinNeighbour.insert(colours_[k]);
+			  neighbours(x,neigh);//Get x's neigh
+			  for(int k=0;k<(int)neigh.size();k++){
+				  if(colours_[neigh[k]]!=0){
+					 UsedinNeighbour.insert(colours_[neigh[k]]);
 				  }
 			  }
-              
+			   
+			  for(int k=1;k<=l+1;k++){U.insert(k);}
 			  set<int>::iterator iter;
 			  if(U.size()>0){
-			      iter=U.end();
-			      U.insert(*(--iter)+1);
 				  if(UsedinNeighbour.size()>0){
                     for(iter=UsedinNeighbour.begin();iter!=UsedinNeighbour.end();iter++){
                          U.erase(U.find(*iter));
@@ -145,7 +142,12 @@ MatrixGraph::getFreeColours(int x, set<int> &U){
 			  else{
 				  U.insert(1);
 			  }
+			  for(iter=U.begin();iter!=U.end();){
+				  if(*iter>l+1) {iter=U.erase(iter);}
+				  else{++iter;}
+			  }
 }
+
 //Get the degree of saturation  vertex x
 int
 MatrixGraph::getVertexDSATUR(int x){
