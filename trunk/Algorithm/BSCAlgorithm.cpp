@@ -1,324 +1,340 @@
 //BSCAlgorithm.cpp
-#include<algorithm>
-#include"BSCAlgorithm2.h"
-#include"Algorithm2.h"
-#include<vector>
-#include<set>
-#include<time.h>
-#include<math.h>
-#include<iostream>
+#include "BSCAlgorithm.h"
+#include "Algorithm.h"
+#include <vector>
+#include <iostream>
 using namespace std;
 
-//Constructor
+// Constructor
 BSCAlgorithm::BSCAlgorithm(Graph* g) {
     g_ = g;
-    for(int i=0;i<g_->getSize();i++){
-	g_->setColour((int) i,0);
-  }
+    // reset colours array
+    g_->resetColours();
 }
 
-// Print out the results
+
+// Tree merge
+int
+BSCAlgorithm::mergeHeap(SkewHeap* h, int a, int b) {
+
+  int root = a;
+  int addee = b;
+
+  // Return if you are trying to merge the same node
+  if (a == b) 
+    return maxInt; // force an error
+
+  if (h[a].DSAT < h[b].DSAT) {
+    root = b;
+    addee = a;
+  }
+
+
+  if (h[root].right != maxInt) {
+    addee = mergeHeap(h,h[root].right,addee);
+  }
+
+  h[addee].parent = root;
+
+  // Swap the children
+  h[root].right = h[root].left;
+  h[root].left  = addee;
+
+  return root;
+}
+
+
+int
+BSCAlgorithm::mergeHeap(SkewHeap* h, queue<int>& q) {
+
+  // Return right away if there are nothing to merge
+  if (q.size() == 1) {
+    int tmp = q.front(); q.pop();
+    return tmp;
+  }
+
+  int root = maxInt;
+
+  // Merging several independent heaps
+  while(q.size() > 1) {
+    int a = q.front(); q.pop();
+    int b = q.front(); q.pop();
+    root = mergeHeap(h,a,b);
+    q.push(root);
+  }
+
+  // push out the last one
+  q.pop();
+
+  return root;
+}
+
 void
-BSCAlgorithm::printResults() {
-    int *colour = g_->getColours();
-    for (int i = 0; i < g_->getSize(); i++) {
-        cout << "vertex " << i << " colour: " << (colour[i]) << endl;
+BSCAlgorithm::update(int x, queue<int>& updates,
+                     vector<pair<int,int> >& undo, SkewHeap* h,
+                     unsigned int* colours) {
+
+    vector<unsigned int> n;
+
+    // Get neigbhours of x and update their 
+    g_->neighbours(x,n);
+
+    // Update the DSAT value of its neighbours
+    // Remove it from the heap and queue it up if it has a parent
+    for (int i = 0; i < n.size(); i++) {
+
+       // Only update DSAT values of non-coloured neighbours
+       if (colours[n[i]] != 0)
+          continue;
+
+       undo.push_back(make_pair(n[i],h[n[i]].DSAT));
+       h[n[i]].DSAT = g_->getVertexDSATUR(n[i]) * g_->getSize() +
+                      g_->getDegree(n[i]);
+
+       // It is already in the queue if it has maxInt as parent
+       if (h[n[i]].parent == notInQueue) {
+         // Add it onto the queue if it is not in the queue yet
+         h[n[i]].parent = maxInt;
+         updates.push(n[i]);
+       } else if (h[n[i]].parent != maxInt) {
+         int parent = h[n[i]].parent;
+         int right  = h[n[i]].right;
+
+         // Give its right child to its parent
+         if (h[parent].left == n[i])
+             h[parent].left = right;
+         else 
+             h[parent].right = right;
+
+         // If the right child is a node, set its parent properly
+         if (right != maxInt)
+             h[right].parent = parent;
+
+         h[n[i]].right = maxInt;
+
+         // Remove from heap
+         h[n[i]].parent = maxInt;
+         updates.push(n[i]);
+       } 
+    }
+};
+
+void
+BSCAlgorithm::revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& updates) {
+
+    // Undo the updated DSAT value of its neighbours
+    // Remove it from the heap and queue it up if it has a parent
+    while (!undo.empty()) {
+
+       int i = undo.back().first;
+       int dsat = undo.back().second;
+       undo.pop_back();
+
+       h[i].DSAT = dsat;
+
+       int left   = h[i].left ;
+       int right  = h[i].right;
+
+       // Cut off its left child if left child is greater after the update
+       if (left != maxInt && h[left].DSAT > dsat) {
+           h[i].left = maxInt;
+           h[left].parent = maxInt;
+           updates.push(left);
+       }
+
+       // Cut off its right child if right child is greater after the update
+       if (right != maxInt && h[right].DSAT > dsat) {
+           h[i].right = maxInt;
+           h[right].parent = maxInt;
+           updates.push(right);
+       }
+    }
+};
+
+
+void
+BSCAlgorithm::popHeap(SkewHeap* h, int root, queue<int>& updates) {
+
+    int right = h[root].right;
+    int left  = h[root].left ;
+
+    // Clear out data
+    h[root].parent = notInQueue;
+    h[root].right  = maxInt;
+    h[root].left   = maxInt;
+
+    // Set the children's parent to maxInt, and push it to updates
+    if (right != maxInt) {
+        h[right].parent = maxInt;
+        updates.push(right);
+    }
+
+    if (left  != maxInt) {
+        h[left].parent  = maxInt;
+        updates.push(left);
     }
 }
-/*
-int
-BSCAlgorithm::colourGraph() {
 
-    return 0;
+void
+BSCAlgorithm::findFreeColour(int a, int colourNumber, set<unsigned int>& neighbour_colours) {
+
+  vector<unsigned int> na;
+  set<unsigned int>::iterator it;
+  unsigned int* colours = g_->getColours();
+
+  g_->neighbours(a,na);
+
+  // insert the set of free colour
+  neighbour_colours.insert(colourNumber);
+  it = neighbour_colours.begin();
+  for(unsigned int j = colourNumber - 1; j > 0; j--)
+     neighbour_colours.insert(it,j);
+
+  // Go through its neighbours and remove neighbouring colours from free colour
+  for (int j = 0; j < na.size() && !neighbour_colours.empty(); j++) {
+     neighbour_colours.erase(colours[na[j]]);
+  }
+
+  // can at most go to colourNumber + 1
+  neighbour_colours.insert(colourNumber+1);
+
 }
-*/
 
 //Test BSC
 int
 BSCAlgorithm::colourGraph(){
-    
-    int k ;//colour number
-    int Fopt=0;//Optimal colour number
-    int start=0;//Starting index
-    int optColourNum=g_->getSize()+1;//Optimal number of colours
-	int size=g_->getSize();
-    vector<int> A;//Set of coloured vertex
-	vector<set<int>> U(size);//	Set of free colors
-	vector<int> colors(size+1);//Number of used colours
-	A.push_back(g_->getMaxDegreeVertex());//The first vertex to color is the MAX degree vertex
-    int x=A[0];//Current vertex to be coloured 
-	vector<int> OptColour(size);//Store the Colouring results
-    bool back; 
-	int i=0;
-	U[i].insert(1);//Initialize the set of free colour with 1
 
-	//a heap of uncoloured vertex
-	//Initializing B
-	vector<pair <int,int>> B(size);
-	for(int i=0;i<size;i++){//Except x in B
-		B[i].first=g_->getVertexDSATUR(i);
-		B[i].second=i;
-	}	
-	vector<pair <int,int>>::iterator itB;//Delete the element which is already put in A
-    for(itB=B.begin();itB!=B.end();){
-		if((*itB).second==x){itB=B.erase(itB);}
-	    else ++itB;
-	}
-    make_heap(B.begin(),B.end());
+    int size = g_->getSize();
+    int optColorNumber; 
+    bool back = false;
+    int start = 0;
+    int root;
 
-    //remember A and B in each step
-	vector<vector<int>> AA(size,vector<int>(size));
-	vector<vector<pair<int,int>>> BB(size,vector<pair<int,int>>(size));
+    BSCData* A = new BSCData[size];
+    queue<int> pendingUpdates;
+    SkewHeap* heap = new SkewHeap[size];
+    unsigned int* colours = g_->getColours();
+    unsigned int* Fopt    = new unsigned int[size];
 
-	//Initialize AA & BB
-	AA[i]=A;
-	BB[i]=B;
+    // Initialize Heap
+    for (int i = 0; i < size; i++) { 
+       heap[i].DSAT   = g_->getDegree(i);
+       heap[i].parent = maxInt;
+       heap[i].left   = maxInt;
+       heap[i].right  = maxInt;
+       pendingUpdates.push(i);
+    }
+    A[0].x = g_->getMaxDegreeVertex();
+    heap[A[0].x].DSAT = g_->getDegree(A[0].x);
+    root = mergeHeap(heap, pendingUpdates);
+    popHeap(heap, root, pendingUpdates);
 
-    //Test the initialization before colouring
-	cout<<"Test the initialization before colouring"<<endl;
-	cout<<"A[i]:";
-    vector<int>::iterator itt;
-	set<int>::iterator it;
-	for(itt=A.begin();itt!=A.end();itt++){cout<<*itt<<" ";}
-    cout<<endl;
-	cout<<"x:"<<x<<" "<<endl;
-    cout<<"U[i]:";
-	for(it=U[0].begin();it!=U[0].end();it++){cout<<*it<<" ";}
-	cout<<endl;
-	cout<<"start="<<start<<endl;
-	cout<<"====Coloring Started===="<<endl;
+    A[0].x = root;
+    A[0].U.insert(1);
+    heap[A[0].x].DSAT = g_->getVertexDSATUR(A[0].x)*size + g_->getDegree(A[0].x);
+    optColorNumber = g_->getDegree(A[0].x) + 1;
+    //optColorNumber = size;
+    while(start >= 0) {
 
-	while(start>=0){	
-       //x is coloured in the following for-loop. Backtracking is
-       //necessary, if U =0; or if an improved colouring has been found
-       back=false;//boolean variable for backtracking
-       for(i=start;i<size;i++){
-	     if(i>start){
-		  	 if(i==start+1 && start>0){
-			   A=AA[start];
-		       B=BB[start]; //A and B are reset to the backtracking state
-			 }
-           g_->getNextVertex(A,B);
-		   cout<<"Asize="<<A.size()<<endl;
-		   cout<<"Bsize="<<B.size()<<endl;
-		   x=A[i];
-		   g_->getFreeColours(x,U[i],colors[i]);//get the set of free colours of x, the set U
-		     AA[i]=A;//Remember the sequence in each state
-		     BB[i]=B;//Remember the sequence in each state
-		   
-	       //Print A[i]
-		   cout<<"A[i]:"<<endl;
-           vector<int>::iterator itt;
-	       for(itt=A.begin();itt!=A.end();itt++){cout<<*itt<<" ";}
-		   cout<<endl;
-		   
-           //Print i,x,U 
-           cout<<"i="<<i<<"  x="<<x<<endl; 
-		   set<int>::iterator it;
-		   cout<<"U: ";
-		   for(it=U[i].begin();it!=U[i].end();it++){cout<<*it<<" ";}
-		   cout<<endl;
-		   cout<<"start="<<start<<endl;		  
-		 }
-		 
-		 if(U[i].size()>0){
-		   k=*(U[i].begin());    //selected free colour
-           g_->setColour(x,k);   // Set x with colour k
-           g_->removeColour(k,U[i]);//Remove k from U			  
-		   int l=colors[i];
-           colors[i+1]=g_->getMax(k,l);
+      back = false;
 
-		   //Print colors(i) 
-		   cout<<"colors("<<i<<")="<<colors[i+1]<<endl;
-		   //Print color used
-		   cout<<"vertex color: "<<k<<endl;
-		   //Print U
-		   
-		   set<int>::iterator it;
-		   cout<<"U(after remove): ";
-		   for(it=U[i].begin();it!=U[i].end();it++){cout<<*it<<" ";}
-		   cout<<endl;
-		   cout<<"**********"<<endl;
-        }
-		
-		else{           //U=0,backtrack one position
-           start=i-1;
-           back=true;
-           break;          //leaving the for-loop
-        }
-	 }//end of for-loop
-   
-        if(back){
-         if(start>=0){
-            x=A[start];  //new starting vertex
-			g_->unColour(x);//uncolour x	
+      // Keep colouring until you can't
+      for (int i = start; i < size; i++) {
+
+         int c = 0;
+
+         // Not the first one
+         if (i > start) {
+
+           if (i > 0)
+              c = A[i-1].colors;
+
+           // Find the node with the maximum degree of saturation
+           root = mergeHeap(heap, pendingUpdates);
+           popHeap(heap, root, pendingUpdates);
+
+           // Find the set of free colour for that node
+           A[i].U.clear();
+           findFreeColour(root,c,A[i].U);
+
          }
-		}
-	        
-		else{//in this case the above for-loop has been passed without a break
-         Fopt=colors[size];//storing the currently optimal colour number
-		 for(int n=0;n<size;n++){ OptColour[n]=g_->getColour(n);}//storing the currently optimal colouring			
-         optColourNum=colors[size];
-		 cout<<"optColourNum="<<optColourNum<<endl;
-		 int least; 
-         for(least=0;least<(int)A.size();least++){//i=least index with F(A[i]) = optColourNumber;
-			 if(g_->getColour(A[least])==optColourNum) {break;}
-         } 
 
-         i=least;   
-		 cout<<"least="<<i<<endl;
-		 
-         start=i-1;
-		 cout<<"start="<<start<<endl;
-		 
-         if(start<0){break;}//leaving the while-loop
+         // Check if the set is empty or not
+         if (A[i].U.size() > 0 && *A[i].U.begin() < optColorNumber) {
 
-		 for(int n=start;n<size;n++){g_->unColour(A[n]);} //uncolour all vertices A[i] with y>=start;
-          
-		 int m;
-         for( m=0;m<=start;m++){
-           x=A[m];           	  
-		   //remove from U all colours>=optColourNumber;
-		   set<int>::iterator it;
-		   for(it=U[m].begin();it!=U[m].end();){
-               if(*it>=optColourNum){it=U[m].erase(it);}
-			   else ++it;
-           }//the current colouring is to be improved		   
-         }//for loop	
-	    }//else branch
-		  //A=AA[start];
-		  //B=BB[start]; //A and B are reset to the backtracking state
-		  cout<<"*****Backtracking Starts*****"<<endl;
-		            /*		            
-                    //Check before loop back
-                  //  cout<<"A[start] before Backtracking: "<<A[start]<<endl;
-                    cout<<"x before Backtracking: "<<x<<endl;
-                    cout<<"start before break: "<<start<<endl;
-					
-                    cout<<"U[start] before Backtracking: "<<endl;
-                    set<int>::iterator itt;
-                    for(itt=U[start].begin();itt!=U[start].end();itt++){
-                      cout<<*itt<<" ";
-                    }
-                    cout<<endl;
-                    */                                         
-     }//while loop 
-	      cout<<"final start: "<<start<<endl;
-          for(int i=0;i<size;i++){g_->setColour(i,OptColour[i]);}
-          return Fopt;   
-}//BSCAlgorithm
+           // Colour the node
+           c = *A[i].U.begin(); A[i].U.erase(A[i].U.begin());
+           colours[root] = c;
 
+           // Remember which node coloured
+           A[i].x = root;
+           if (i > 0)
+             A[i].colors = max(c,A[i-1].colors);
+           else
+             A[i].colors = c;
 
-void main() {
-    unsigned int gSize =1000;
-	double density=0.1;
-    vector < vector<bool> > testMatrix;
-    testMatrix.resize(gSize, vector<bool>(gSize, 0));
+           // Update the heap
+           update(A[i].x, pendingUpdates, A[i].undo, heap, colours);
+         } else {
+           // Exit for loop if failed
+           start = i-1;
+           back = true;
+           break;
+         }
+      }
 
-    //initialize adjacency matrix graph
-    Graph* g;
-    g = new MatrixGraph(testMatrix, gSize);
-    /* 
-      0 1 2 3 4 5 6
-    0 0 1 1 0 1 1 0
-    1 1 0 0 1 0 1 1
-    2 1 0 0 1 1 1 0
-    3 0 1 1 0 0 1 1
-    4 1 0 1 0 0 0 1
-    5 1 1 1 1 0 0 0
-    6 0 1 0 1 1 0 0
-    */
-	/*
-    g->addNeighbour(0, 1);
-    g->addNeighbour(0, 2);
-    g->addNeighbour(0, 4);
-    g->addNeighbour(0, 5);
-    g->addNeighbour(1, 3);
-    g->addNeighbour(1, 5);
-    g->addNeighbour(1, 6);
-    g->addNeighbour(2, 3);
-    g->addNeighbour(2, 4);
-    g->addNeighbour(2, 5);
-    g->addNeighbour(3, 5);
-    g->addNeighbour(3, 6);
-    g->addNeighbour(4, 6);
-	*/
-	/*
- // Make it complete graph K7,7
-    g->addNeighbour(0, 3);
-    g->addNeighbour(0, 6);
-    g->addNeighbour(1, 2);
-    g->addNeighbour(1, 4);
-  //g->addNeighbour(2, 6);
-    g->addNeighbour(3, 4);
-    g->addNeighbour(4, 5);
-    g->addNeighbour(0, 1);
-  //g->addNeighbour(0, 2);
-    g->addNeighbour(0, 4);
-    g->addNeighbour(0, 5);
-    g->addNeighbour(1, 3);
-    g->addNeighbour(1, 5);
-    g->addNeighbour(1, 6);
-  //g->addNeighbour(2, 3);
-    g->addNeighbour(2, 4);
-    g->addNeighbour(2, 5);
-//  g->addNeighbour(3, 5);
-    g->addNeighbour(3, 6);
-    g->addNeighbour(4, 6);
-    g->addNeighbour(5, 6);
-	*/
+      // Check if the above for loop found a good colouring or not
+      if (back) {
 
-   //Generating a larger Graph for test
-  
-   int num_edges=(gSize*(gSize-1)/2);
-   pair<int,int> *edges=new pair<int,int>[num_edges];
-   pair<int,int> p;
-   int ctr=0;
-	
-   //initialize the vector
-   for (int i=0;i<(int)gSize;i++) {
-     for (int j=i+1;j<(int)gSize;j++) {
-       p.first = i;
-       p.second = j;
-       edges[ctr] = p;
-       ctr++;  
-     }
-   }
+        // Add the removed node back to the heap
+        if (heap[root].parent == notInQueue) {
+           heap[root].parent = maxInt;
+           pendingUpdates.push(root);
+        }
 
-   //initialize random seed
-    srand (time(NULL));
+        if (start >= 0) {
 
-   // Start swapping edges randomly
-   for (int i = 0; i < num_edges; i++) {
-     int j = rand() % num_edges;
-     p = edges[j];
-     edges[j] = edges[i];
-     edges[i] = p;
-   } 
-	
-   // Print out the number of edges in the graph
-   int e=ceil(density * num_edges);
-   cout <<"Number of Edges="<<e<<endl;
+          // Try another colour for the previous node
+          root = A[start].x;
+          colours[root] = 0;
+          revert(heap,A[start].undo,pendingUpdates);
+ 
+        }
+      } else {
 
-   // Print out the results
-     for (int k=0;k<e;k++) {
-		g->addNeighbour(edges[k].first,edges[k].second);
-     }
-   delete [] edges;
-   
+        // Copy the colouring over
+        for (int i = 0; i < size; i++)
+           Fopt[i] = colours[i];
 
-    Algorithm *a = new BSCAlgorithm(g);
-   //run algorithm
-	
-    cout<<"Number of Color Used: "<<a->colourGraph()<< endl;
-    a->printResults();
-	//cout<<"Graph:  "<<endl;
-	//g->printGraph();
-	//Check the coloring
+        int prevOpt = optColorNumber;
+        optColorNumber = A[size-1].colors;
 
-	cout<<endl;
-	if(g->checkGraph()==1){cout<<"This colouring is RIGHT!!!!!"<<endl;}
-	else{cout<<"This colouring is WRONG!!!!!"<<endl;}
+        // Look for where to restart and remove unused colours of the freeColor set
+        for (start = 0; A[start].colors != optColorNumber; start++) {
+           for (int i = prevOpt; i >= optColorNumber; i--) 
+              A[start].U.erase(i);
+        }
+        start--;
+        if (start < 0)
+           break;      // optimal is found!
 
-	system("pause");
+        // revert changes
+        for (int i = size-1; i >= start; i--) {
+          colours[A[i].x] = 0;
+          if (heap[A[i].x].parent == notInQueue) {
+             heap[A[i].x].parent = maxInt;
+             pendingUpdates.push(A[i].x);
+          }
+          revert(heap,A[i].undo,pendingUpdates);
+        }
+        colours[start] = 0;
+        root = start;
+      }
+
+    }
+
+    // copy Fopt over
+    g_->setColour(Fopt); 
+ 
+    return optColorNumber;  
 }

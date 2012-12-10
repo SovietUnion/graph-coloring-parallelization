@@ -33,7 +33,6 @@ protected:
 
       // Basic Data
       int x;
-      int root;
       int colors;
 
       set<unsigned int> U;
