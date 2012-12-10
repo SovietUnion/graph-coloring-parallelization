@@ -1,9 +1,9 @@
 //BSCAlgorithm.cpp
-#include<algorithm>
+#include <algorithm>
 #include "BSCAlgorithm.h"
-#include"Algorithm.h"
-#include<vector>
-#include<iostream>
+#include "Algorithm.h"
+#include <vector>
+#include <iostream>
 using namespace std;
 
 // Constructor
@@ -22,7 +22,7 @@ BSCAlgorithm::mergeHeap(SkewHeap* h, int a, int b) {
   int addee = b;
 
   // Return if you are trying to merge the same node
-  if (a == b)
+  if (a == b) 
     return a;
 
   // Take the larger one as root
@@ -32,7 +32,9 @@ BSCAlgorithm::mergeHeap(SkewHeap* h, int a, int b) {
   } 
 
   if (h[root].right != maxInt) {
+    //cout << "mergin " << h[root].right << " addee " << addee << endl;
     addee = mergeHeap(h,h[root].right,addee);
+    //cout << "addee is  " << addee << endl;
   }
 
   h[addee].parent = root;
@@ -59,9 +61,9 @@ BSCAlgorithm::mergeHeap(SkewHeap* h, queue<int>& q) {
   while(q.size() > 1) {
     int a = q.front(); q.pop();
     int b = q.front(); q.pop();
-    //cout << " a " << a << " b " << b << endl;
+   // cout << " a " << a << " b " << b << endl;
     root = mergeHeap(h,a,b);
-    //cout << "mPushed: " << root << endl;
+   // cout << "mPushed: " << root << endl;
     q.push(root);
   }
 
@@ -142,6 +144,7 @@ BSCAlgorithm::revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& upda
 
        // Cut off its left child if left child is greater after the update
        if (left != maxInt && h[left].DSAT > dsat) {
+           h[i].left = maxInt;
            h[left].parent = maxInt;
           // cout << "rPushed: " << left << endl;
            updates.push(left);
@@ -149,6 +152,7 @@ BSCAlgorithm::revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& upda
 
        // Cut off its right child if right child is greater after the update
        if (right != maxInt && h[right].DSAT > dsat) {
+           h[i].right = maxInt;
            h[right].parent = maxInt;
           // cout << "rPushed: " << right << endl;
            updates.push(right);
@@ -251,7 +255,7 @@ BSCAlgorithm::colourGraph(){
      // cout << "Re/Starting at: " << start << endl;
       for (int i = start; i < size; i++) {
 
-     // cout << "i at: " << i << endl;
+      cout << "i at: " << i << endl;
          int c = 0;
 
          // Not the first one
