@@ -32,9 +32,7 @@ BSCAlgorithm::mergeHeap(SkewHeap* h, int a, int b) {
   } 
 
   if (h[root].right != maxInt) {
-    //cout << "mergin " << h[root].right << " addee " << addee << endl;
     addee = mergeHeap(h,h[root].right,addee);
-    //cout << "addee is  " << addee << endl;
   }
 
   h[addee].parent = root;
@@ -51,19 +49,18 @@ int
 BSCAlgorithm::mergeHeap(SkewHeap* h, queue<int>& q) {
 
   // Return right away if there are nothing to merge
-  if (q.size() == 1)
-    return q.front();
+  if (q.size() == 1) {
+    int tmp = q.front(); q.pop();
+    return tmp;
+  }
 
-  //cout << "queue " << q.size() << endl;
   int root = maxInt;
 
   // Merging several independent heaps
   while(q.size() > 1) {
     int a = q.front(); q.pop();
     int b = q.front(); q.pop();
-   // cout << " a " << a << " b " << b << endl;
     root = mergeHeap(h,a,b);
-   // cout << "mPushed: " << root << endl;
     q.push(root);
   }
 
@@ -92,11 +89,11 @@ BSCAlgorithm::update(int x, queue<int>& updates,
           continue;
 
        undo.push_back(make_pair(n[i],h[n[i]].DSAT));
-       h[n[i]].DSAT = g_->getVertexDSATUR(n[i]);
+       h[n[i]].DSAT = g_->getVertexDSATUR(n[i]) * g_->getSize() +
+                      g_->getDegree(n[i]);
 
        // It is already in the queue if it has maxInt as parent
        if (h[n[i]].parent == notInQueue) {
-         cout << "error??????????????????????? " << endl; 
           // Add it onto the queue if it is not in the queue yet
          h[n[i]].parent = maxInt;
          updates.push(n[i]);
@@ -104,8 +101,6 @@ BSCAlgorithm::update(int x, queue<int>& updates,
          int parent = h[n[i]].parent;
          int right  = h[n[i]].right;
 
-        // cout << "Looking for " << n[i] << endl;
-        // cout << "Right " << h[parent].right << " Left " << h[parent].left << endl;
          // Give its right child to its parent
          if (h[parent].left == n[i])
              h[parent].left = right;
@@ -118,9 +113,8 @@ BSCAlgorithm::update(int x, queue<int>& updates,
 
          h[n[i]].right = maxInt;
 
-         // Remove from node
+         // Remove from heap
          h[n[i]].parent = maxInt;
-        // cout << "Pushed: " << n[i] << endl;
          updates.push(n[i]);
        } 
     }
@@ -146,7 +140,6 @@ BSCAlgorithm::revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& upda
        if (left != maxInt && h[left].DSAT > dsat) {
            h[i].left = maxInt;
            h[left].parent = maxInt;
-          // cout << "rPushed: " << left << endl;
            updates.push(left);
        }
 
@@ -154,7 +147,6 @@ BSCAlgorithm::revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& upda
        if (right != maxInt && h[right].DSAT > dsat) {
            h[i].right = maxInt;
            h[right].parent = maxInt;
-          // cout << "rPushed: " << right << endl;
            updates.push(right);
        }
     }
@@ -168,20 +160,18 @@ BSCAlgorithm::popHeap(SkewHeap* h, int root, queue<int>& updates) {
     int left  = h[root].left ;
 
     // Clear out data
-    h[root].parent = maxInt;
+    h[root].parent = notInQueue;
     h[root].right  = maxInt;
     h[root].left   = maxInt;
 
     // Set the children's parent to maxInt, and push it to updates
     if (right != maxInt) {
         h[right].parent = maxInt;
-         //cout << "popPushed: " << right << endl;
         updates.push(right);
     }
 
     if (left  != maxInt) {
         h[left].parent  = maxInt;
-         //cout << "popPushed: " << left  << endl;
         updates.push(left);
     }
 }
@@ -211,8 +201,6 @@ BSCAlgorithm::findFreeColour(int a, int colourNumber, set<unsigned int>& neighbo
 
 }
 
-
-
 //Test BSC
 int
 BSCAlgorithm::colourGraph(){
@@ -231,7 +219,7 @@ BSCAlgorithm::colourGraph(){
 
     // Initialize Heap
     for (int i = 0; i < size; i++) { 
-       heap[i].DSAT   = 0;
+       heap[i].DSAT   = g_->getDegree(i);
        heap[i].parent = maxInt;
        heap[i].left   = maxInt;
        heap[i].right  = maxInt;
@@ -244,7 +232,7 @@ BSCAlgorithm::colourGraph(){
 
     A[0].x = root;
     A[0].U.insert(1);
-    heap[A[0].x].DSAT = g_->getVertexDSATUR(A[0].x);
+    heap[A[0].x].DSAT = g_->getDegree(A[0].x);
     optColorNumber = g_->getDegree(A[0].x) + 1;
    
     while(start >= 0) {
@@ -252,10 +240,8 @@ BSCAlgorithm::colourGraph(){
       back = false;
 
       // Keep colouring until you can't
-     // cout << "Re/Starting at: " << start << endl;
       for (int i = start; i < size; i++) {
 
-      cout << "i at: " << i << endl;
          int c = 0;
 
          // Not the first one
@@ -264,13 +250,6 @@ BSCAlgorithm::colourGraph(){
            if (i > 0)
               c = A[i-1].colors;
     
-   // for (int j = 0; j < size; j++)
-   //  cout << "N" << j << " DSAT:" << heap[j].DSAT
-   //       << " P:" << heap[j].parent
-   //       << " R:" << heap[j].right 
-   //       << " L:" << heap[j].left << endl;
-
-
            // Find the node with the maximum degree of saturation
            root = mergeHeap(heap, pendingUpdates);
            popHeap(heap, root, pendingUpdates);
@@ -287,7 +266,6 @@ BSCAlgorithm::colourGraph(){
            // Colour the node
            c = *A[i].U.begin(); A[i].U.erase(A[i].U.begin());
            colours[root] = c;
-           //cout << "c " << c << endl;
 
            // Remember which node coloured
            A[i].x = root;
@@ -310,8 +288,10 @@ BSCAlgorithm::colourGraph(){
       if (back) {
 
         // Add the removed node back to the heap
-        //cout << "backPushed: " << root << endl;
-        pendingUpdates.push(root);
+        if (heap[root].parent == notInQueue) {
+           heap[root].parent = maxInt;
+           pendingUpdates.push(root);
+        }
 
         if (start >= 0) {
 
@@ -319,7 +299,6 @@ BSCAlgorithm::colourGraph(){
           root = A[start].x;
           colours[root] = 0;
           revert(heap,A[start].undo,pendingUpdates);
-         // cout << "reverted" << endl;
  
         }
       } else {
@@ -330,8 +309,11 @@ BSCAlgorithm::colourGraph(){
 
         optColorNumber = A[size-1].colors;
 
-        // Look for where to restart
-        for (start = optColorNumber - 1; A[start].colors != optColorNumber; start++);
+        // Look for where to restart and remove unused colours of the freeColor set
+        for (start = 0; A[start].colors != optColorNumber; start++) {
+           for (int i = prevOpt; i >= optColorNumber; i--) 
+              A[start].U.erase(i);
+        }
         start--;
         if (start < 0)
            break;      // optimal is found!
@@ -339,7 +321,10 @@ BSCAlgorithm::colourGraph(){
         // revert changes
         for (int i = size-1; i > start; i--) {
           colours[A[i].x] = 0;
-          pendingUpdates.push(A[i].x);
+          if (heap[A[i].x].parent == notInQueue) {
+             heap[A[i].x].parent = maxInt;
+             pendingUpdates.push(A[i].x);
+          }
           revert(heap,A[i].undo,pendingUpdates);
         }
         colours[start] = 0;
