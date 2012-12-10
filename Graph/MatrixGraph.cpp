@@ -222,6 +222,31 @@ MatrixGraph::restoreVertex(int a, vector<bool> b) {
    graph[a] = b;
 }
 
+// BSC functions
+
+//Get the degree of saturation vertex x
+int
+MatrixGraph::getVertexDSATUR (int x) {
+
+	vector<unsigned int> n;
+	this->neighbours(x,n);
+	
+	set<int> adjacentColor;
+
+	for(int i=0;i<(int)n.size();i++){
+           if(colours_[n[i]]!=0){
+             adjacentColor.insert(colours_[n[i]]);
+	   }
+	}
+        return adjacentColor.size();
+}
+
+void
+MatrixGraph::setColour(unsigned int* c) {
+   delete [] colours_;
+   colours_ = c;
+}
+
 ostream& 
 MatrixGraph::print(ostream &os) const
 {

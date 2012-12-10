@@ -3,6 +3,7 @@
 #define GRAPH_H
 #include <iostream> 
 #include <vector>
+#include <set>
 
 using namespace std;
 
@@ -12,6 +13,11 @@ protected:
    unsigned int * degrees_;
 
 public:
+
+    // Return the degree of saturation for node x
+    virtual int getVertexDSATUR(int x) = 0;
+    virtual void setColour(unsigned int* c) = 0;
+
     // Return true if a and b are neighbours
     virtual bool isNeighbours(int a, int b) = 0;
 
@@ -78,6 +84,7 @@ public:
     // Get the vertex degree
     virtual int getDegree(int vertex, int from, int to) = 0;
     
+
     // override default ostream so cout<<object can be achieved
     friend ostream& operator<<(ostream &os, const Graph &g) {
        g.print(os);

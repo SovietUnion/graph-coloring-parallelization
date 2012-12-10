@@ -5,6 +5,15 @@
 class MatrixGraph: public Graph {
 
    public:
+ 
+    // BSC ///
+
+    //Get the degree of saturation of vertex x
+    virtual int getVertexDSATUR(int x);
+    virtual void setColour(unsigned int* c);
+
+    // BSC ///
+
     // Constructor that generates a 2d graph
     MatrixGraph(unsigned int mSize);
     // Constructor that take in a pregenerated graph
@@ -73,14 +82,16 @@ class MatrixGraph: public Graph {
     // Get the vertex degree
     virtual int getDegree(int vertex, int from, int to);
     
+    // BSC
+
     // format ostream output to printout the graph matrix
     virtual ostream& print(ostream &os) const;
     private: 
 	unsigned int size;	
 	vector<vector<bool> > graph;
 
+
+
 };
-
-
 
 #endif
