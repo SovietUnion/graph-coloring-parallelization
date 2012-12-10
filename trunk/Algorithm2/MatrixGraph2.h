@@ -12,6 +12,9 @@ class MatrixGraph: public Graph {
 	// Return true if a and b are neighbours
     virtual bool isNeighbours(int a, int b);
 	
+	// Return an iterator that will iteratates all the neighbours of a
+    virtual void neighbours(int a, vector<int> &neighbours);
+
     // Add an edge between a and b
     virtual void addNeighbour(int a, int b);
 
@@ -43,7 +46,7 @@ class MatrixGraph: public Graph {
 	virtual int getVertexDSATUR(int x);
 
     //Get the set of free colours, which used but not present in neighbor of x
-    virtual void getFreeColours(int x,set<int> &U);
+    virtual void getFreeColours(int x,set<int> &U,int l);
    
     //Get the number of used colour
     virtual int getUsedColourNum(int i,vector<int> &U);
@@ -62,6 +65,10 @@ class MatrixGraph: public Graph {
 
 	// Return an vector containing the neighbours of a
     virtual vector<int> getNeighbours(int a);
+
+
+	// Check if Graph g with colouring scheme c is valid or not
+    virtual bool checkGraph(); 
 
     private:
         int size;
