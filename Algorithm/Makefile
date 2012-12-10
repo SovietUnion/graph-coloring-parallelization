@@ -1,6 +1,8 @@
-test_algorithm: ParallelContractAlgorithm.o ../Graph/MatrixGraph.o Test_Algorithm.o
-	g++ -pthread -fpermissive -o test_algorithm ParallelContractAlgorithm.o ../Graph/MatrixGraph.o Test_Algorithm.o
-ContractAlgorithm.o: Algorithm.h ParallelContractAlgorithm.h
-	g++ -c Test_Algorithm.cpp ParallelContractAlgorithm.cpp Algorithm.h ParallelContractAlgorithm.h
+test_algorithm: Algorithm.o ParallelBSCAlgorithm.o ../Graph/MatrixGraph.o Test_Algorithm2.o
+	g++ -pthread -fpermissive -o test_algorithm Algorithm.o ParallelBSCAlgorithm.o ../Graph/MatrixGraph.o Test_Algorithm2.o
+ParallelBSCAlgorithm.o: Algorithm.h ParallelBSCAlgorithm.h
+	g++ -c Test_Algorithm2.cpp ParallelBSCAlgorithm.cpp Algorithm.h ParallelBSCAlgorithm.h
+Algorithm.o: Algorithm.h
+	g++ -c Algorithm.cpp
 clean: 
-	rm *.o test_algorithm
+	rm ../Graph/*.o *.o test_algorithm
