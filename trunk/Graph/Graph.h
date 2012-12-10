@@ -3,6 +3,7 @@
 #define GRAPH_H
 #include <iostream> 
 #include <vector>
+#include <queue>
 #include <set>
 
 using namespace std;
@@ -77,7 +78,8 @@ public:
     // Backup and restore a vertex
     virtual void backupVertex (int a, vector<bool> &b) = 0;
     virtual void restoreVertex(int a, vector<bool> b) = 0;
-    
+    // Get neighbour of higher index
+    virtual void neighbours(int a, queue<unsigned int> &neighbours, int from) = 0; 
     // Contract a into b within a slice;
     virtual void contract(int a, int b, int from, int to) = 0;
     

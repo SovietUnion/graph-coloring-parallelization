@@ -78,7 +78,8 @@ class MatrixGraph: public Graph {
     // Backup and restore a vertex
     virtual void backupVertex (int a, vector<bool> &b);
     virtual void restoreVertex(int a, vector<bool> b);
-    
+    // Get neighbour of higher index
+    virtual void neighbours(int a, queue<unsigned int> &neighbours, int from); 
     // Get the vertex degree
     virtual int getDegree(int vertex, int from, int to);
     

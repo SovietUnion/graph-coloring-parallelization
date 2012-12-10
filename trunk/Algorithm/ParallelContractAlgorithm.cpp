@@ -84,9 +84,10 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
         size--;
     }
 
+
     return (void*)colournumber;
 }
-
+/*
 void*
 ParallelContractAlgorithm::detectConflict(void* arg) {
 
@@ -95,7 +96,7 @@ ParallelContractAlgorithm::detectConflict(void* arg) {
     queue<pair<int,int> >* conflicts = (queue<pair<int,int> >*) p[2];
     int size = g_->getSize();
     unsigned int* colours = g_->getColours();
-
+    
     for (unsigned slice1 = 0; slice1 < threadcount_; slice1++) {
 
       // block 1 from to end
@@ -131,7 +132,43 @@ ParallelContractAlgorithm::detectConflict(void* arg) {
     }
 
 }
+*/
+void*
+ParallelContractAlgorithm::detectConflict(void* arg) {
 
+    void** p = (void**) arg;
+    int slice_ = (int)((long) p[1]);
+    queue<pair<int,int> >* conflicts = (queue<pair<int,int> >*) p[2];
+    int size = g_->getSize();
+    unsigned int* colours = g_->getColours();
+
+    int from = (slice_ * size)/threadcount_;	
+    int to = ((slice_+1) * size)/threadcount_;    
+    queue<unsigned int> n;
+    for (unsigned int i = from; i < to; i++) {
+
+        g_->neighbours(i, n, i);
+        //vector<unsigned int>::iterator it;
+        while(!n.empty()){
+            int j = n.front();
+            n.pop();
+            if (colours[i] == colours[j] ) {
+                pair<int,int> tmp;
+
+              if (g_->getDegree(i) < g_->getDegree(j)){
+                 tmp.first = i; tmp.second = j;
+              } else {
+                 tmp.first = j; tmp.second = i;
+              }
+                
+              conflicts->push(tmp);
+            }
+            
+        }
+       
+    }
+    
+}
 
 unsigned int
 ParallelContractAlgorithm::findFreeColour(int a, int colourNumber) {
@@ -211,10 +248,8 @@ ParallelContractAlgorithm::colourGraph() {
 
     // Print out conflits
     unsigned int* colours = g_->getColours();
-
     for (int i = 0; i < threadcount_; i++) {
-
-       // Resolve conflicts one by one
+        // Resolve conflicts one by one
        while (!conflicts[i].empty()) {
          int a = conflicts[i].front().first;
          int b = conflicts[i].front().second;
@@ -247,7 +282,6 @@ ParallelContractAlgorithm::colourGraph() {
 
        }
     }
-
 
     for (int i = 0; i < threadcount_; i++)
         delete [] p[i];
