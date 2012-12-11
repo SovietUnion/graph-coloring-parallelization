@@ -40,7 +40,8 @@ public:
 
     // Get the vertext with Maximal degree of a particular set
     virtual int getMaxDegreeVertex(vector<unsigned int> & nn) = 0;
-
+ // Get the vertext with Maximal degree of a particular set
+    virtual int getMaxDegreeVertex(set<unsigned int> & nn) = 0;
     // Get the vertex degree
     virtual int getDegree(int vertex) = 0;
 

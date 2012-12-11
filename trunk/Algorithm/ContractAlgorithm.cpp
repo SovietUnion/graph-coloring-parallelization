@@ -22,9 +22,14 @@ ContractAlgorithm::colourGraph() {
 
     int colournumber = 0;
     int size = g_->getSize();
-    while (size > 0) {
+    set<unsigned int> n;
+    for (int i = 0; i < size; i++) {
+        n.insert(i);
+    }
+    
+    while (!n.empty()) {
         // determien a vertex x of maximal degree in G
-        int x = g_->getMaxDegreeVertex();
+        int x = g_->getMaxDegreeVertex(n);
         // color x
         g_->setColour(x, ++colournumber);
         // retrieve set of non-neighbors for x
@@ -53,14 +58,14 @@ ContractAlgorithm::colourGraph() {
             g_->setColour(y, colournumber);
             // contract y to x
             g_->contract(x, y);
-            size--;
-
+            //size--;
+            n.erase(y);
             // update set of NN of non-neighbors of x
             nn.clear();
             g_->nonNeighbours(x, nn);
 
         }
-        size--;
+        n.erase(x);
     }
     return colournumber;
 }
