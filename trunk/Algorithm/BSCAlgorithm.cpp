@@ -234,10 +234,15 @@ BSCAlgorithm::colourGraph(){
     heap[A[0].x].DSAT = g_->getVertexDSATUR(A[0].x)*size + g_->getDegree(A[0].x);
     optColorNumber = g_->getDegree(A[0].x) + 1;
     //optColorNumber = size;
+    
     while(start >= 0) {
 
       back = false;
 
+      cout << "V" << start << ": C" << optColorNumber << ": ";
+      for (set<unsigned int>::iterator it = A[start].U.begin(); it != A[start].U.end(); it++)
+          cout << " " << (*it);
+      cout << endl;
       // Keep colouring until you can't
       for (int i = start; i < size; i++) {
 
@@ -248,6 +253,9 @@ BSCAlgorithm::colourGraph(){
 
            if (i > 0)
               c = A[i-1].colors;
+
+           if (optColorNumber - 2 > 0)
+              c = min(c,optColorNumber - 2);
 
            // Find the node with the maximum degree of saturation
            root = mergeHeap(heap, pendingUpdates);
