@@ -258,6 +258,21 @@ MatrixGraph::getVertexDSATUR (int x) {
         return adjacentColor.size();
 }
 
+int
+MatrixGraph::getVertexDSATUR (int x, unsigned int* c) {
+
+	vector<unsigned int> n;
+	this->neighbours(x,n);
+	
+	set<int> adjacentColor;
+
+	for(int i=0;i<(int)n.size();i++){
+           if(c[n[i]]!=0){
+             adjacentColor.insert(c[n[i]]);
+	   }
+	}
+        return adjacentColor.size();
+}
 void
 MatrixGraph::setColour(unsigned int* c) {
    delete [] colours_;

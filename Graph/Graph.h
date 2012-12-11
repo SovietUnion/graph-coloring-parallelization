@@ -17,6 +17,7 @@ public:
 
     // Return the degree of saturation for node x
     virtual int getVertexDSATUR(int x) = 0;
+    virtual int getVertexDSATUR(int x, unsigned int* c) = 0;
     virtual void setColour(unsigned int* c) = 0;
 
     // Return true if a and b are neighbours
