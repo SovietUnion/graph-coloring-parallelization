@@ -10,6 +10,7 @@ class MatrixGraph: public Graph {
 
     //Get the degree of saturation of vertex x
     virtual int getVertexDSATUR(int x);
+    virtual int getVertexDSATUR(int x, unsigned int* c);
     virtual void setColour(unsigned int* c);
 
     // BSC ///
