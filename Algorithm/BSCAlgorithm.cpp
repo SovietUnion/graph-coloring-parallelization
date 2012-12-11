@@ -239,10 +239,10 @@ BSCAlgorithm::colourGraph(){
 
       back = false;
 
-      cout << "V" << start << ": C" << optColorNumber << ": ";
-      for (set<unsigned int>::iterator it = A[start].U.begin(); it != A[start].U.end(); it++)
-          cout << " " << (*it);
-      cout << endl;
+      //cout << "V" << start << ": C" << optColorNumber << ": ";
+      //for (set<unsigned int>::iterator it = A[start].U.begin(); it != A[start].U.end(); it++)
+      //    cout << " " << (*it);
+      //cout << endl;
       // Keep colouring until you can't
       for (int i = start; i < size; i++) {
 
