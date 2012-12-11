@@ -10,6 +10,7 @@ ParallelContractAlgorithm::ParallelContractAlgorithm(Graph* g, int threadcount) 
     // reset colours array
     g_->resetColours();
     threadcount_=threadcount;
+
 }
 
 // Print out the results
@@ -30,15 +31,18 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
     int from = (slice_ * size)/threadcount_;	
     int to = ((slice_+1) * size)/threadcount_;
     int colournumber = 0;
-    bool firstRun = true;
-    bool secondRun = true;
+    set<unsigned int> n;
+    for (int i = from; i < to; i++) {
+        n.insert(i);
+    }
+    
     
     // Update the size of slice(note: "to: is upper bound but exclusive)
-    size = to-from;
+    //size = to-from;
     //cout<<"slice no: "<<slice_<<" from: " <<from<<" to:" << to<<endl;
-    while ( size > 0) {
+    while (!n.empty()) {
         // determine a vertex x of maximal degree in G
-        int x = g_->getMaxDegreeVertex(from, to);
+        int x = g_->getMaxDegreeVertex(n);
 
         // color x
         colournumber++;
@@ -72,16 +76,18 @@ ParallelContractAlgorithm::colourSubGraph(void* slice) {
             g_->setColour(y, colournumber);
             // contract y to x
             //g_->contract(x, y,from,to);
-            g_->contract(x, y);
-            size--;
-
+            g_->contract(x, y,from,to);
+            //size--;
+            n.erase(y);
             // update set of NN of non-neighbors of x
             nn.clear();
             g_->nonNeighbours(x, nn,from,to);
 
         }
         g_->restoreVertex(x,b);
-        size--;
+        //size--;
+        n.erase(x);
+        
     }
 
 

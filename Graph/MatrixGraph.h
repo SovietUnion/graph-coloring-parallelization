@@ -45,7 +45,8 @@ class MatrixGraph: public Graph {
     
     // Get the vertext with Maximal degree of a particular set
     virtual int getMaxDegreeVertex(vector<unsigned int> & nn);
-    
+     // Get the vertext with Maximal degree of a particular set
+    virtual int getMaxDegreeVertex(set<unsigned int> & nn);
     // Get the vertex count in G
     virtual unsigned int getSize();
 

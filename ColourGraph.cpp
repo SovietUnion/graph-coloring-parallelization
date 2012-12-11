@@ -88,6 +88,7 @@ int main(int argc, char* argv[]) {
     if (graph.is_open()) {
         graph >> numNodes;
         graph >> numEdges;
+        cerr<<numEdges;
         g = new MatrixGraph(numNodes);
 
         string line;

@@ -113,7 +113,24 @@ MatrixGraph::getMaxDegreeVertex(vector<unsigned int> & nn) {
 
     vector<unsigned int>::iterator it;
     for (it = nn.begin(); it < nn.end(); it++) {
-        if (colours_[*it] == 0 && (tempDegree = degrees_[*it]) > maxDegree) {
+        if ( (tempDegree = degrees_[*it]) > maxDegree) {
+            maxDegree = tempDegree;
+            maxVertex = *it;
+        }
+    }
+    return maxVertex;
+
+}
+
+int 
+MatrixGraph::getMaxDegreeVertex(set<unsigned int> & nn) {
+    int maxDegree = -1;
+    int maxVertex = 0;
+    int tempDegree = 0;
+
+    set<unsigned int>::iterator it;
+    for (it = nn.begin(); it != nn.end(); it++) {
+        if ( (tempDegree = degrees_[*it]) > maxDegree) {
             maxDegree = tempDegree;
             maxVertex = *it;
         }
