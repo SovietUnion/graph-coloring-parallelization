@@ -40,10 +40,10 @@ protected:
     };
 
     // Heap functions
-    static int  mergeHeap(SkewHeap* h, int a, int b);
-    static int  mergeHeap(SkewHeap* h, queue<int>& q);
-    static void popHeap(SkewHeap* h, int root, queue<int>& updates);
-    static void revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& updates);
+    int  mergeHeap(SkewHeap* h, int a, int b);
+    int  mergeHeap(SkewHeap* h, queue<int>& q);
+    void popHeap(SkewHeap* h, int root, queue<int>& updates);
+    void revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& updates);
 
     // updates 
     void update(int x, queue<int>& updates, vector<pair<int,int> >& undo,

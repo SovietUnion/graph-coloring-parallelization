@@ -217,7 +217,7 @@ ParallelBSCAlgorithm::findFreeColour(int a, int colourNumber, set<unsigned int>&
   }
 
   // can at most go to colourNumber + 1
-  neighbour_colours.insert(colourNumber+1);
+  //neighbour_colours.insert(colourNumber+1);
 
 }
 
@@ -287,18 +287,14 @@ ParallelBSCAlgorithm::colourGraph(void* c){
 
          int c = 0;
 
-      cout << "V" << i << ": C" << optColorNumber << ": ";
-      for (set<unsigned int>::iterator it = A[start].U.begin(); it != A[start].U.end(); it++)
-          cout << " " << (*it);
-      cout << endl;
          // Not the first one
          if (i > start) {
 
            if (i > 0)
-              c = A[i-1].colors;
+              c = A[i-1].colors + 1;
 
-           if (optColorNumber - 2 > 0)
-              c = min(c,optColorNumber - 2);
+           if (optColorNumber - 1 > 0)
+              c = min(c,optColorNumber - 1);
 
            // Find the node with the maximum degree of saturation
            root = mergeHeap(heap, pendingUpdates);
@@ -310,6 +306,10 @@ ParallelBSCAlgorithm::colourGraph(void* c){
 
          }
 
+      cout << "T" << t << ": I" << i << ": V" << root << ": C" << optColorNumber << ": ";
+      for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
+          cout << " " << (*it);
+      cout << endl;
          // Check if the set is empty or not
          if (A[i].U.size() > 0 && *A[i].U.begin() < optColorNumber) {
 

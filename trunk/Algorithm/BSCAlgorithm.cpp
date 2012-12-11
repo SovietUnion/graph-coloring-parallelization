@@ -46,7 +46,7 @@ BSCAlgorithm::mergeHeap(SkewHeap* h, int a, int b) {
 
 int
 BSCAlgorithm::mergeHeap(SkewHeap* h, queue<int>& q) {
-
+  
   // Return right away if there are nothing to merge
   if (q.size() == 1) {
     int tmp = q.front(); q.pop();
@@ -66,14 +66,14 @@ BSCAlgorithm::mergeHeap(SkewHeap* h, queue<int>& q) {
   // push out the last one
   q.pop();
 
-  return root;
+  return root; 
 }
 
 void
 BSCAlgorithm::update(int x, queue<int>& updates,
                      vector<pair<int,int> >& undo, SkewHeap* h,
                      unsigned int* colours) {
-
+  
     vector<unsigned int> n;
 
     // Get neigbhours of x and update their 
@@ -116,7 +116,7 @@ BSCAlgorithm::update(int x, queue<int>& updates,
          h[n[i]].parent = maxInt;
          updates.push(n[i]);
        } 
-    }
+    } 
 };
 
 void
@@ -148,7 +148,7 @@ BSCAlgorithm::revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& upda
            h[right].parent = maxInt;
            updates.push(right);
        }
-    }
+    } 
 };
 
 
@@ -185,18 +185,15 @@ BSCAlgorithm::findFreeColour(int a, int colourNumber, set<unsigned int>& neighbo
   g_->neighbours(a,na);
 
   // insert the set of free colour
-  neighbour_colours.insert(colourNumber);
+  neighbour_colours.insert(colourNumber+1);
   it = neighbour_colours.begin();
-  for(unsigned int j = colourNumber - 1; j > 0; j--)
+  for(unsigned int j = colourNumber; j > 0; j--)
      neighbour_colours.insert(it,j);
 
   // Go through its neighbours and remove neighbouring colours from free colour
   for (int j = 0; j < na.size() && !neighbour_colours.empty(); j++) {
      neighbour_colours.erase(colours[na[j]]);
   }
-
-  // can at most go to colourNumber + 1
-  neighbour_colours.insert(colourNumber+1);
 
 }
 
@@ -233,7 +230,6 @@ BSCAlgorithm::colourGraph(){
     A[0].U.insert(1);
     heap[A[0].x].DSAT = g_->getVertexDSATUR(A[0].x)*size + g_->getDegree(A[0].x);
     optColorNumber = g_->getDegree(A[0].x) + 1;
-    //optColorNumber = size;
     
     while(start >= 0) {
 
@@ -242,10 +238,6 @@ BSCAlgorithm::colourGraph(){
       // Keep colouring until you can't
       for (int i = start; i < size; i++) {
 
-      //cout << "V" << i << ": C" << optColorNumber << ": ";
-      //for (set<unsigned int>::iterator it = A[start].U.begin(); it != A[start].U.end(); it++)
-      //    cout << " " << (*it);
-      //cout << endl;
          int c = 0;
 
          // Not the first one
@@ -264,8 +256,12 @@ BSCAlgorithm::colourGraph(){
            // Find the set of free colour for that node
            A[i].U.clear();
            findFreeColour(root,c,A[i].U);
-
          }
+
+      //cout << "V" << root << ": C" << optColorNumber << ": ";
+      //for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
+      //    cout << " " << (*it);
+      //cout << endl;
 
          // Check if the set is empty or not
          if (A[i].U.size() > 0 && *A[i].U.begin() < optColorNumber) {
@@ -273,9 +269,10 @@ BSCAlgorithm::colourGraph(){
            // Colour the node
            c = *A[i].U.begin(); A[i].U.erase(A[i].U.begin());
            colours[root] = c;
+           A[i].x = root;
+         
 
            // Remember which node coloured
-           A[i].x = root;
            if (i > 0)
              A[i].colors = max(c,A[i-1].colors);
            else
@@ -312,6 +309,7 @@ BSCAlgorithm::colourGraph(){
            Fopt[i] = colours[i];
 
         optColorNumber = A[size-1].colors;
+        cerr << optColorNumber << endl;
 
         // Look for where to restart and remove unused colours of the freeColor set
         for (start = 0; A[start].colors != optColorNumber; start++) {
@@ -321,7 +319,7 @@ BSCAlgorithm::colourGraph(){
             }
         }
         start--;
-        if (start < 0)
+        if (start < 0 )
            break;      // optimal is found!
 
         // revert changes
@@ -333,8 +331,7 @@ BSCAlgorithm::colourGraph(){
           }
           revert(heap,A[i].undo,pendingUpdates);
         }
-        colours[start] = 0;
-        root = start;
+        root = A[start].x;
       }
 
     }
