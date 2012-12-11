@@ -239,13 +239,13 @@ BSCAlgorithm::colourGraph(){
 
       back = false;
 
-      //cout << "V" << start << ": C" << optColorNumber << ": ";
-      //for (set<unsigned int>::iterator it = A[start].U.begin(); it != A[start].U.end(); it++)
-      //    cout << " " << (*it);
-      //cout << endl;
       // Keep colouring until you can't
       for (int i = start; i < size; i++) {
 
+      cout << "V" << i << ": C" << optColorNumber << ": ";
+      for (set<unsigned int>::iterator it = A[start].U.begin(); it != A[start].U.end(); it++)
+          cout << " " << (*it);
+      cout << endl;
          int c = 0;
 
          // Not the first one
@@ -301,26 +301,24 @@ BSCAlgorithm::colourGraph(){
         }
 
         if (start >= 0) {
-
           // Try another colour for the previous node
           root = A[start].x;
           colours[root] = 0;
           revert(heap,A[start].undo,pendingUpdates);
- 
         }
       } else {
-
         // Copy the colouring over
         for (int i = 0; i < size; i++)
            Fopt[i] = colours[i];
 
-        int prevOpt = optColorNumber;
         optColorNumber = A[size-1].colors;
 
         // Look for where to restart and remove unused colours of the freeColor set
         for (start = 0; A[start].colors != optColorNumber; start++) {
-           for (int i = prevOpt; i >= optColorNumber; i--) 
-              A[start].U.erase(i);
+           for (set<unsigned int>::reverse_iterator it = A[start].U.rbegin();
+                it != A[start].U.rend() && *it >= optColorNumber; it = A[start].U.rbegin()) {
+                    A[start].U.erase(*it);
+            }
         }
         start--;
         if (start < 0)
