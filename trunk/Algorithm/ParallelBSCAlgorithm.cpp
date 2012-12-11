@@ -66,11 +66,11 @@ ParallelBSCAlgorithm::mergeHeap(SkewHeap* h, int a, int b) {
 
 
 int
-ParallelBSCAlgorithm::mergeHeap(SkewHeap* h, queue<int>& q) {
+ParallelBSCAlgorithm::mergeHeap(SkewHeap* h, list<int>& q) {
 
   // Return right away if there are nothing to merge
   if (q.size() == 1) {
-    int tmp = q.front(); q.pop();
+    int tmp = q.front(); q.pop_front();
     return tmp;
   }
 
@@ -78,20 +78,20 @@ ParallelBSCAlgorithm::mergeHeap(SkewHeap* h, queue<int>& q) {
 
   // Merging several independent heaps
   while(q.size() > 1) {
-    int a = q.front(); q.pop();
-    int b = q.front(); q.pop();
+    int a = q.front(); q.pop_front();
+    int b = q.front(); q.pop_front();
     root = mergeHeap(h,a,b);
-    q.push(root);
+    q.push_back(root);
   }
 
   // push out the last one
-  q.pop();
+  q.pop_front();
 
   return root;
 }
 
 void
-ParallelBSCAlgorithm::update(int x, queue<int>& updates,
+ParallelBSCAlgorithm::update(int x, list<int>& updates,
                      vector<pair<int,int> >& undo, SkewHeap* h,
                      unsigned int* colours) {
 
@@ -116,7 +116,7 @@ ParallelBSCAlgorithm::update(int x, queue<int>& updates,
        if (h[n[i]].parent == notInQueue) {
          // Add it onto the queue if it is not in the queue yet
          h[n[i]].parent = maxInt;
-         updates.push(n[i]);
+         updates.push_back(n[i]);
        } else if (h[n[i]].parent != maxInt) {
          int parent = h[n[i]].parent;
          int right  = h[n[i]].right;
@@ -135,13 +135,13 @@ ParallelBSCAlgorithm::update(int x, queue<int>& updates,
 
          // Remove from heap
          h[n[i]].parent = maxInt;
-         updates.push(n[i]);
+         updates.push_back(n[i]);
        } 
     }
 };
 
 void
-ParallelBSCAlgorithm::revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& updates) {
+ParallelBSCAlgorithm::revert(SkewHeap* h, vector<pair<int,int> >& undo, list<int>& updates) {
 
     // Undo the updated DSAT value of its neighbours
     // Remove it from the heap and queue it up if it has a parent
@@ -160,21 +160,21 @@ ParallelBSCAlgorithm::revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<in
        if (left != maxInt && h[left].DSAT > dsat) {
            h[i].left = maxInt;
            h[left].parent = maxInt;
-           updates.push(left);
+           updates.push_back(left);
        }
 
        // Cut off its right child if right child is greater after the update
        if (right != maxInt && h[right].DSAT > dsat) {
            h[i].right = maxInt;
            h[right].parent = maxInt;
-           updates.push(right);
+           updates.push_back(right);
        }
     }
 };
 
 
 void
-ParallelBSCAlgorithm::popHeap(SkewHeap* h, int root, queue<int>& updates) {
+ParallelBSCAlgorithm::popHeap(SkewHeap* h, int root, list<int>& updates) {
 
     int right = h[root].right;
     int left  = h[root].left ;
@@ -187,12 +187,12 @@ ParallelBSCAlgorithm::popHeap(SkewHeap* h, int root, queue<int>& updates) {
     // Set the children's parent to maxInt, and push it to updates
     if (right != maxInt) {
         h[right].parent = maxInt;
-        updates.push(right);
+        updates.push_back(right);
     }
 
     if (left  != maxInt) {
         h[left].parent  = maxInt;
-        updates.push(left);
+        updates.push_back(left);
     }
 }
 
@@ -226,35 +226,58 @@ int
 ParallelBSCAlgorithm::colourGraph(){
 
     int size = g_->getSize();
-    int optColorNumber; 
-    bool back = false;
-    int start = 0;
-    int root;
 
-    ParallelBSCData* A = new ParallelBSCData[size];
-    queue<int> pendingUpdates;
-    SkewHeap* heap = new SkewHeap[size];
-    unsigned int* colours = g_->getColours();
-    unsigned int* Fopt    = new unsigned int[size];
+    T[0]->A       = new ParallelBSCData[size];
+    T[0]->heap    = new SkewHeap[size];
+    T[0]->colours = g_->getColours();
+    T[0]->Fopt    = new unsigned int[size];
 
     // Initialize Heap
     for (int i = 0; i < size; i++) { 
-       heap[i].DSAT   = g_->getDegree(i);
-       heap[i].parent = maxInt;
-       heap[i].left   = maxInt;
-       heap[i].right  = maxInt;
-       pendingUpdates.push(i);
+       T[0]->heap[i].DSAT   = g_->getDegree(i);
+       T[0]->heap[i].parent = maxInt;
+       T[0]->heap[i].left   = maxInt;
+       T[0]->heap[i].right  = maxInt;
+       T[0]->pendingUpdates.push_back(i);
     }
-    A[0].x = g_->getMaxDegreeVertex();
-    heap[A[0].x].DSAT = g_->getDegree(A[0].x);
-    root = mergeHeap(heap, pendingUpdates);
-    popHeap(heap, root, pendingUpdates);
+    T[0]->A[0].x = g_->getMaxDegreeVertex();
+    T[0]->heap[T[0]->A[0].x].DSAT = g_->getDegree(T[0]->A[0].x);
+    T[0]->root = mergeHeap(T[0]->heap, T[0]->pendingUpdates);
+    popHeap(T[0]->heap, T[0]->root, T[0]->pendingUpdates);
 
-    A[0].x = root;
-    A[0].U.insert(1);
-    heap[A[0].x].DSAT = g_->getVertexDSATUR(A[0].x)*size + g_->getDegree(A[0].x);
-    optColorNumber = g_->getDegree(A[0].x) + 1;
-    //optColorNumber = size;
+    T[0]->A[0].x = T[0]->root;
+    T[0]->A[0].U.insert(1);
+    T[0]->optColorNumber = g_->getDegree(T[0]->A[0].x) + 1;
+    
+    T[0]->folkPoint = 0;
+
+    long tmp = (long) colourGraph((void*) 0);
+
+}
+
+void*
+ParallelBSCAlgorithm::colourGraph(void* c){
+
+    int size = g_->getSize();
+    int optColorNumber; 
+    int folkPoint; 
+    bool back;
+    int start;
+    int root;
+    int t = 0;
+    long ret;
+
+    ParallelBSCData* A;
+    list<int> pendingUpdates;
+    SkewHeap* heap;
+    unsigned int* colours;
+    unsigned int* Fopt;
+
+    // Copy the data from thread
+    goto copyFromThread;
+    returnToTop:
+
+    // main loop
     while(start >= 0) {
 
       back = false;
@@ -264,6 +287,10 @@ ParallelBSCAlgorithm::colourGraph(){
 
          int c = 0;
 
+      cout << "V" << i << ": C" << optColorNumber << ": ";
+      for (set<unsigned int>::iterator it = A[start].U.begin(); it != A[start].U.end(); it++)
+          cout << " " << (*it);
+      cout << endl;
          // Not the first one
          if (i > start) {
 
@@ -313,7 +340,7 @@ ParallelBSCAlgorithm::colourGraph(){
         // Add the removed node back to the heap
         if (heap[root].parent == notInQueue) {
            heap[root].parent = maxInt;
-           pendingUpdates.push(root);
+           pendingUpdates.push_back(root);
         }
 
         if (start >= 0) {
@@ -348,7 +375,7 @@ ParallelBSCAlgorithm::colourGraph(){
           colours[A[i].x] = 0;
           if (heap[A[i].x].parent == notInQueue) {
              heap[A[i].x].parent = maxInt;
-             pendingUpdates.push(A[i].x);
+             pendingUpdates.push_back(A[i].x);
           }
           revert(heap,A[i].undo,pendingUpdates);
         }
@@ -360,6 +387,43 @@ ParallelBSCAlgorithm::colourGraph(){
 
     // copy Fopt over
     g_->setColour(Fopt); 
- 
-    return optColorNumber;  
+
+    // Copy the data back to thread
+    goto copyToThread;
+    returnToExit:
+
+    ret = optColorNumber; 
+    return (void*) ret;  
+
+    // Sub-Functions for renaming the variables for better readabiltiy 
+    // C++ doesn't allow nested functions :(
+    copyFromThread:
+      // Simple Variables
+      optColorNumber = T[t]->optColorNumber; 
+      folkPoint      = T[t]->folkPoint;
+      start          = T[t]->start;
+      back           = T[t]->back;
+      root           = T[t]->root;
+
+      A = T[t]->A;
+      heap = T[t]->heap;
+      Fopt = T[t]->Fopt;
+      colours = T[t]->colours;
+      T[t]->pendingUpdates.swap(pendingUpdates);
+      goto returnToTop;
+
+    copyToThread:
+      // Simple Variables
+      T[t]->optColorNumber = optColorNumber;  
+      T[t]->folkPoint      = folkPoint     ; 
+      T[t]->start          = start         ; 
+      T[t]->back           = back          ; 
+      T[t]->root           = root          ; 
+
+      T[t]->A = A;
+      T[t]->heap = heap;
+      T[t]->Fopt = Fopt;
+      T[t]->colours = colours;
+      T[t]->pendingUpdates.swap(pendingUpdates);
+      goto returnToExit;
 }

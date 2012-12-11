@@ -5,7 +5,7 @@
 #include "Algorithm.h"
 #include <pthread.h>
 #include <set>
-#include <queue>
+#include <list>
 #include <stack>
 
 using namespace std;
@@ -73,12 +73,12 @@ protected:
       int root;
 
       ParallelBSCData* A;
-      queue<int> pendingUpdates;
+      list<int> pendingUpdates;
       SkewHeap* heap;
       unsigned int* colours;
       unsigned int* Fopt;
-      vector<int> childrenThread; // Keep track of you children  
-      vector<int> threadPool;     // Keep track of unused threads
+      list<int>  childrenThread; // Keep track of your children  
+      list<int>  threadPool;     // Keep track of unused threads
       stack<int> spawnLocation;   // Keep track of where you spawned
 
     };
@@ -91,9 +91,9 @@ protected:
 
     // Heap functions
     static int  mergeHeap(SkewHeap* h, int a, int b);
-    static int  mergeHeap(SkewHeap* h, queue<int>& q);
-    static void popHeap(SkewHeap* h, int root, queue<int>& updates);
-    static void revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& updates);
+    static int  mergeHeap(SkewHeap* h, list<int>& q);
+    static void popHeap(SkewHeap* h, int root, list<int>& updates);
+    static void revert(SkewHeap* h, vector<pair<int,int> >& undo, list<int>& updates);
 
     // Helper Function
     static void* colour_helper(void* c)
@@ -104,7 +104,7 @@ protected:
     void* colourGraph(void* c);
  
     // updates 
-    void update(int x, queue<int>& updates, vector<pair<int,int> >& undo,
+    void update(int x, list<int>& updates, vector<pair<int,int> >& undo,
                 SkewHeap* h, unsigned int* colours);
 
     void findFreeColour(int a, int colourNumber, set<unsigned int>& neighbour_colours);
