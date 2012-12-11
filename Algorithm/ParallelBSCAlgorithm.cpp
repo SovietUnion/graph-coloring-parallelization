@@ -250,6 +250,9 @@ ParallelBSCAlgorithm::colourGraph(){
            if (i > 0)
               c = A[i-1].colors;
 
+           if (optColorNumber - 2 > 0)
+              c = min(c,optColorNumber - 2);
+
            // Find the node with the maximum degree of saturation
            root = mergeHeap(heap, pendingUpdates);
            popHeap(heap, root, pendingUpdates);
