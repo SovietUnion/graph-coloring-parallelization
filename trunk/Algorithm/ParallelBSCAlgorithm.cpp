@@ -7,10 +7,30 @@ using namespace std;
 
 // Constructor
 ParallelBSCAlgorithm::ParallelBSCAlgorithm(Graph* g, int threadcount) {
+
     g_ = g;
     // reset colours array
     g_->resetColours();
+
+    // Initialize the array pointers
     threadcount_=threadcount;
+    threads = new pthread_t*[threadcount];
+    T   = new MiscData*[threadcount];
+    p2c = new PtoC*[threadcount];
+    c2p = new CtoP*[threadcount];
+
+    // Arguments used for thread creation
+    void*** arg = new void**[threadcount];
+
+    // Initialize array
+    for (int i = 0; i < threadcount; i++) {
+       arg[i] = new void*[2];
+       arg[i][0] = (void*) this;
+       arg[i][1] = (void*) i;
+       T[i] = new MiscData();
+       p2c[i] = new PtoC();
+       c2p[i] = new CtoP();
+    }
 }
 
 
@@ -206,139 +226,137 @@ int
 ParallelBSCAlgorithm::colourGraph(){
 
     int size = g_->getSize();
-    int optColorNumber; 
-    bool back = false;
-    int start = 0;
-    int root;
+    T[0]->back = false;
+    T[0]->start = 0;
 
-    ParallelBSCData* A = new ParallelBSCData[size];
-    queue<int> pendingUpdates;
-    SkewHeap* heap = new SkewHeap[size];
-    unsigned int* colours = g_->getColours();
-    unsigned int* Fopt    = new unsigned int[size];
+    T[0]->A = new ParallelBSCData[size];
+    T[0]->heap = new SkewHeap[size];
+    T[0]->colours = g_->getColours();
+    T[0]->Fopt    = new unsigned int[size];
 
     // Initialize Heap
     for (int i = 0; i < size; i++) { 
-       heap[i].DSAT   = g_->getDegree(i);
-       heap[i].parent = maxInt;
-       heap[i].left   = maxInt;
-       heap[i].right  = maxInt;
-       pendingUpdates.push(i);
+       T[0]->heap[i].DSAT   = g_->getDegree(i);
+       T[0]->heap[i].parent = maxInt;
+       T[0]->heap[i].left   = maxInt;
+       T[0]->heap[i].right  = maxInt;
+       T[0]->pendingUpdates.push(i);
     }
-    A[0].x = g_->getMaxDegreeVertex();
-    heap[A[0].x].DSAT = g_->getDegree(A[0].x);
-    root = mergeHeap(heap, pendingUpdates);
-    popHeap(heap, root, pendingUpdates);
+    T[0]->A[0].x = g_->getMaxDegreeVertex();
+    T[0]->heap[T[0]->A[0].x].DSAT = g_->getDegree(T[0]->A[0].x);
+    T[0]->root = mergeHeap(T[0]->heap, T[0]->pendingUpdates);
+    popHeap(T[0]->heap, T[0]->root, T[0]->pendingUpdates);
 
-    A[0].x = root;
-    A[0].U.insert(1);
-    heap[A[0].x].DSAT = g_->getVertexDSATUR(A[0].x)*size + g_->getDegree(A[0].x);
-    optColorNumber = g_->getDegree(A[0].x) + 1;
+    T[0]->A[0].x = T[0]->root;
+    T[0]->A[0].U.insert(1);
+    T[0]->heap[T[0]->A[0].x].DSAT = g_->getVertexDSATUR(T[0]->A[0].x)*size + g_->getDegree(T[0]->A[0].x);
+    T[0]->optColorNumber = g_->getDegree(T[0]->A[0].x) + 1;
     //optColorNumber = size;
-    while(start >= 0) {
+    while(T[0]->start >= 0) {
 
-      back = false;
+      T[0]->back = false;
 
       // Keep colouring until you can't
-      for (int i = start; i < size; i++) {
+      for (int i = T[0]->start; i < size; i++) {
 
          int c = 0;
 
          // Not the first one
-         if (i > start) {
+         if (i > T[0]->start) {
 
            if (i > 0)
-              c = A[i-1].colors;
+              c = T[0]->A[i-1].colors;
 
-           if (optColorNumber - 2 > 0)
-              c = min(c,optColorNumber - 2);
+           if (T[0]->optColorNumber - 2 > 0)
+              c = min(c,T[0]->optColorNumber - 2);
 
            // Find the node with the maximum degree of saturation
-           root = mergeHeap(heap, pendingUpdates);
-           popHeap(heap, root, pendingUpdates);
+           T[0]->root = mergeHeap(T[0]->heap, T[0]->pendingUpdates);
+           popHeap(T[0]->heap, T[0]->root, T[0]->pendingUpdates);
 
            // Find the set of free colour for that node
-           A[i].U.clear();
-           findFreeColour(root,c,A[i].U);
+           T[0]->A[i].U.clear();
+           findFreeColour(T[0]->root,c,T[0]->A[i].U);
 
          }
 
          // Check if the set is empty or not
-         if (A[i].U.size() > 0 && *A[i].U.begin() < optColorNumber) {
+         if (T[0]->A[i].U.size() > 0 && *T[0]->A[i].U.begin() < T[0]->optColorNumber) {
 
            // Colour the node
-           c = *A[i].U.begin(); A[i].U.erase(A[i].U.begin());
-           colours[root] = c;
+           c = *T[0]->A[i].U.begin(); T[0]->A[i].U.erase(T[0]->A[i].U.begin());
+           T[0]->colours[T[0]->root] = c;
 
            // Remember which node coloured
-           A[i].x = root;
+           T[0]->A[i].x = T[0]->root;
            if (i > 0)
-             A[i].colors = max(c,A[i-1].colors);
+             T[0]->A[i].colors = max(c,T[0]->A[i-1].colors);
            else
-             A[i].colors = c;
+             T[0]->A[i].colors = c;
 
            // Update the heap
-           update(A[i].x, pendingUpdates, A[i].undo, heap, colours);
+           update(T[0]->A[i].x, T[0]->pendingUpdates,
+                  T[0]->A[i].undo, T[0]->heap, T[0]->colours);
          } else {
            // Exit for loop if failed
-           start = i-1;
-           back = true;
+           T[0]->start = i-1;
+           T[0]->back = true;
            break;
          }
       }
 
       // Check if the above for loop found a good colouring or not
-      if (back) {
+      if (T[0]->back) {
 
         // Add the removed node back to the heap
-        if (heap[root].parent == notInQueue) {
-           heap[root].parent = maxInt;
-           pendingUpdates.push(root);
+        if (T[0]->heap[T[0]->root].parent == notInQueue) {
+           T[0]->heap[T[0]->root].parent = maxInt;
+           T[0]->pendingUpdates.push(T[0]->root);
         }
 
-        if (start >= 0) {
+        if (T[0]->start >= 0) {
 
           // Try another colour for the previous node
-          root = A[start].x;
-          colours[root] = 0;
-          revert(heap,A[start].undo,pendingUpdates);
+          T[0]->root = T[0]->A[T[0]->start].x;
+          T[0]->colours[T[0]->root] = 0;
+          revert(T[0]->heap,T[0]->A[T[0]->start].undo,T[0]->pendingUpdates);
  
         }
       } else {
 
         // Copy the colouring over
         for (int i = 0; i < size; i++)
-           Fopt[i] = colours[i];
+           T[0]->Fopt[i] = T[0]->colours[i];
 
-        int prevOpt = optColorNumber;
-        optColorNumber = A[size-1].colors;
+        int prevOpt = T[0]->optColorNumber;
+        T[0]->optColorNumber = T[0]->A[size-1].colors;
 
         // Look for where to restart and remove unused colours of the freeColor set
-        for (start = 0; A[start].colors != optColorNumber; start++) {
-           for (int i = prevOpt; i >= optColorNumber; i--) 
-              A[start].U.erase(i);
+        for (T[0]->start = 0; T[0]->A[T[0]->start].colors != T[0]->optColorNumber; T[0]->start++) {
+           for (int i = prevOpt; i >= T[0]->optColorNumber; i--) 
+              T[0]->A[T[0]->start].U.erase(i);
         }
-        start--;
-        if (start < 0)
+        T[0]->start--;
+        if (T[0]->start < 0)
            break;      // optimal is found!
 
         // revert changes
-        for (int i = size-1; i >= start; i--) {
-          colours[A[i].x] = 0;
-          if (heap[A[i].x].parent == notInQueue) {
-             heap[A[i].x].parent = maxInt;
-             pendingUpdates.push(A[i].x);
+        for (int i = size-1; i >= T[0]->start; i--) {
+          T[0]->colours[T[0]->A[i].x] = 0;
+          if (T[0]->heap[T[0]->A[i].x].parent == notInQueue) {
+             T[0]->heap[T[0]->A[i].x].parent = maxInt;
+             T[0]->pendingUpdates.push(T[0]->A[i].x);
           }
-          revert(heap,A[i].undo,pendingUpdates);
+          revert(T[0]->heap,T[0]->A[i].undo,T[0]->pendingUpdates);
         }
-        colours[start] = 0;
-        root = start;
+        T[0]->colours[T[0]->start] = 0;
+        T[0]->root = T[0]->start;
       }
 
     }
 
     // copy Fopt over
-    g_->setColour(Fopt); 
+    g_->setColour(T[0]->Fopt); 
  
-    return optColorNumber;  
+    return T[0]->optColorNumber;  
 }

@@ -3,6 +3,7 @@
 #define PARALLELBSCALGORITHM_H
 
 #include "Algorithm.h"
+#include <pthread.h>
 #include <set>
 #include <queue>
 #include <stack>
@@ -42,20 +43,29 @@ protected:
     };
 
     // Signals between Parent to Children threads
-    enum TtoCSignal {
+    enum PtoCSig {
        CONTINUE, KILL, RETURN
     };
 
     // Thread Current Status
-    enum CtoTIndicator {
-       RUNNING, RETURNED
+    enum CtoPSig {
+       RUNNING, RETURNED, KILLED
+    };
+
+    // Structures for Communications
+    struct PtoC {
+        PtoCSig s;
+        int OptColorFound;
+    };
+    struct CtoP {
+        CtoPSig s;
+        int OptColorFound;
     };
 
     // Data used by colourGraph
     struct MiscData {
 
       // Simple Variables
-      int size;
       int optColorNumber; 
       int folkPoint;
       bool back;
@@ -73,12 +83,26 @@ protected:
 
     };
 
+    // Instance Data
+    pthread_t** threads;
+    MiscData**  T;
+    PtoC**      p2c;
+    CtoP**      c2p;
+
     // Heap functions
     static int  mergeHeap(SkewHeap* h, int a, int b);
     static int  mergeHeap(SkewHeap* h, queue<int>& q);
     static void popHeap(SkewHeap* h, int root, queue<int>& updates);
     static void revert(SkewHeap* h, vector<pair<int,int> >& undo, queue<int>& updates);
 
+    // Helper Function
+    static void* colour_helper(void* c)
+    {
+       void** p = (void**) c;
+       return  ((ParallelBSCAlgorithm*)p[0])->colourGraph((void*) p[1]);
+    }
+    void* colourGraph(void* c);
+ 
     // updates 
     void update(int x, queue<int>& updates, vector<pair<int,int> >& undo,
                 SkewHeap* h, unsigned int* colours);
