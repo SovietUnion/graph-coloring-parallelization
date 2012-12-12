@@ -13,8 +13,8 @@ using namespace std;
 class ParallelBSCAlgorithm : public Algorithm{
 public:
 
-    static const int maxInt     = 2147483647;
-    static const int notInQueue = 2147483646;
+    static const int maxInt     = 2147483646;
+    static const int notInQueue = 2147483645;
 
     // Constructor
     ParallelBSCAlgorithm(Graph* g, int threadcount);
@@ -69,7 +69,9 @@ protected:
     struct MiscData {
 
       // Simple Variables
+      unsigned int holdingFopt;
       int optColorNumber; 
+      int prevColor;
       int forkPoint;
       BackAction back;
       int start;
