@@ -563,7 +563,7 @@ ParallelBSCAlgorithm::colourGraph(void* c){
     }
 
     LOOP_END:
-    cout << "Thread " << t << " completed" << endl;
+    //cout << "Thread " << t << " completed" << endl;
     // Wait for spawned threads
     while (!T[t]->spawn.empty()) {
 
