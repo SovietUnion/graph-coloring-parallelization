@@ -1,13 +1,17 @@
 #!/bin/bash
 
-rm -rf Output/$1
-mkdir -p Output/$1
+rm -rf Output/$1/$3
+mkdir -p Output/$1/$3
 
 ls Input/$1 | while read line
 do
-  ./colour_graph Input/$1/$line $2 $3 > Output/$1/$line.out 2>> Output/$1/$1.summary
-  ./Graph_Checker/graphchecker Input/$1/$line Output/$1/$line.out >> Output/$1/$1.summary
+  ./colour_graph Input/$1/$line $2 $3 > Output/$1/$3/$line.out 2>> Output/$1/$3/$1.summary
+  ./Graph_Checker/graphchecker Input/$1/$line Output/$1/$3/$line.out >> Output/$1/$3/$1.summary
   if [ "$?" -eq "1" ] ; then
     break;
   fi;
 done
+
+grep ms Output/$1/$3/$1.summary | awk '{s += $4} END {print "average time: ", s/NR}' > Output/$1/$3/$1.average
+grep colour Output/$1/$3/$1.summary | awk '{s += $5} END {print "average colour: ", s/NR}' >> Output/$1/$3/$1.average
+
