@@ -43,12 +43,16 @@ protected:
 
     // Signals between Parent to Children threads
     enum PtoCSig {
-       CONTINUE, KILL, RETURN
+       PC_CONTINUE, PC_KILL, PC_PAUSE 
     };
 
     // Thread Current Status
     enum CtoPSig {
-       RUNNING, RETURNED, KILLED
+       CP_RUNNING, CP_RETURNED, CP_PAUSE, CP_KILLED
+    };
+
+    enum BackAction {
+       BACK_ONCE, BACK_ROLLBACK, BACK_KILL, BACK_GOOD
     };
 
     // Structures for Communications
@@ -67,7 +71,7 @@ protected:
       // Simple Variables
       int optColorNumber; 
       int forkPoint;
-      bool back;
+      BackAction back;
       int start;
       int root;
 
@@ -83,6 +87,7 @@ protected:
 
       // Keep track of where you spawned,
       // first is thread ID, second is spawn location
+      //list<pair<int,int> > spawn;
       list<pair<int,int> > spawn;
     };
 
@@ -103,7 +108,6 @@ protected:
     static void* colour_helper(void* c)
     {
        void** p = (void**) c;
-       cout << "been here" << endl;
        return  ((ParallelBSCAlgorithm*)p[0])->colourGraph((void*) p[1]);
     }
     void* colourGraph(void* c);
@@ -112,7 +116,7 @@ protected:
     void update(int x, list<int>& updates, vector<pair<int,int> >& undo,
                 SkewHeap* h, unsigned int* colours);
 
-    void findFreeColour(int a, int colourNumber, set<unsigned int>& neighbour_colours);
+    void findFreeColour(int a, int colourNumber, set<unsigned int>& neighbour_colours, unsigned int* colours);
     void prepareDataForThread(int parent, int child, int fork);
 };
 
