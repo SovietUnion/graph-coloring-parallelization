@@ -39,7 +39,6 @@ protected:
 
       set<unsigned int> U;
       vector<pair<int,int> > undo;
-      stack<int> spawnedThread;
     };
 
     // Signals between Parent to Children threads
@@ -67,7 +66,7 @@ protected:
 
       // Simple Variables
       int optColorNumber; 
-      int folkPoint;
+      int forkPoint;
       bool back;
       int start;
       int root;
@@ -77,10 +76,14 @@ protected:
       SkewHeap* heap;
       unsigned int* colours;
       unsigned int* Fopt;
-      list<int>  childrenThread; // Keep track of your children  
-      list<int>  threadPool;     // Keep track of unused threads
-      stack<int> spawnLocation;   // Keep track of where you spawned
 
+      // Parallel Data
+      int parent;
+      list<int>  threadPool;        // Keep track of unused threads
+
+      // Keep track of where you spawned,
+      // first is thread ID, second is spawn location
+      list<pair<int,int> > spawn;
     };
 
     // Instance Data
@@ -88,6 +91,7 @@ protected:
     MiscData**  T;
     PtoC**      p2c;
     CtoP**      c2p;
+    void*** pth_arg;
 
     // Heap functions
     static int  mergeHeap(SkewHeap* h, int a, int b);
@@ -99,6 +103,7 @@ protected:
     static void* colour_helper(void* c)
     {
        void** p = (void**) c;
+       cout << "been here" << endl;
        return  ((ParallelBSCAlgorithm*)p[0])->colourGraph((void*) p[1]);
     }
     void* colourGraph(void* c);
@@ -108,6 +113,7 @@ protected:
                 SkewHeap* h, unsigned int* colours);
 
     void findFreeColour(int a, int colourNumber, set<unsigned int>& neighbour_colours);
+    void prepareDataForThread(int parent, int child, int fork);
 };
 
 #endif
