@@ -74,7 +74,6 @@ ParallelBSCAlgorithm::mergeHeap(SkewHeap* h, int a, int b) {
 int
 ParallelBSCAlgorithm::mergeHeap(SkewHeap* h, list<int>& q) {
 
-   //cout << " I m here " << q.size() << endl;
   // Return right away if there are nothing to merge
   if (q.size() == 1) {
     int tmp = q.front(); q.pop_front();
@@ -87,7 +86,6 @@ ParallelBSCAlgorithm::mergeHeap(SkewHeap* h, list<int>& q) {
   while(q.size() > 1) {
     int a = q.front(); q.pop_front();
     int b = q.front(); q.pop_front();
-    //cout << " a " << a << " b " << b << endl;
     root = mergeHeap(h,a,b);
     q.push_back(root);
   }
@@ -104,7 +102,7 @@ ParallelBSCAlgorithm::update(int x, list<int>& updates,
                      unsigned int* colours) {
 
     vector<unsigned int> n;
-    //undo.clear();
+    undo.clear();
 
     // Get neigbhours of x and update their 
     g_->neighbours(x,n);
@@ -138,7 +136,7 @@ ParallelBSCAlgorithm::update(int x, list<int>& updates,
 
          // If the right child is a node, set its parent properly
          if (right != maxInt)
-             h[right].parent = parent;
+           h[right].parent = parent;
 
          h[n[i]].right = maxInt;
 
@@ -232,23 +230,22 @@ ParallelBSCAlgorithm::prepareDataForThread (int parent, int child, int fork) {
 
     int size = g_->getSize();
     int pfork = T[parent]->forkPoint;
-    int cfork = T[parent]->forkPoint + fork;
+    int cfork = fork;// + fork;
     int numFreeColor = T[parent]->A[fork].U.size()  / 2;
     int numThread    = T[parent]->threadPool.size() / 2;
 
     T[child]->optColorNumber = T[parent]->optColorNumber; 
-    T[child]->holdingFopt    = maxInt; 
+    T[child]->holdingFopt    = maxInt;
     T[child]->forkPoint      = cfork;
     T[child]->parent         = parent;
     T[child]->start          = 0;
     T[child]->back           = T[parent]->back;
     T[child]->root           = T[parent]->root;
 
-    if (fork > 0) {
-      T[child]->prevColor      = T[parent]->A[fork-1].colors+1;  
-    } else {
-      T[child]->prevColor      = T[parent]->prevColor+1;  
-    }
+    if (fork > 0)
+      T[child]->prevColor      = T[parent]->A[fork-1].colors;  
+    else
+      T[child]->prevColor      = T[parent]->prevColor;  
 
     // Initialize Colour
     for (int i = 0; i < size; i++)
@@ -267,7 +264,7 @@ ParallelBSCAlgorithm::prepareDataForThread (int parent, int child, int fork) {
     // Give half the set and threads to the child
     set<unsigned int>::reverse_iterator it = T[parent]->A[fork].U.rbegin();
     for (int i = 0; i < numFreeColor; i++,it++) {
-        T[child]->A[0].U.insert(*it);
+        T[child]->A[fork].U.insert(*it);
         T[parent]->A[fork].U.erase(*it);
     }
     for (int i = 0; i < numThread; i++)
@@ -314,8 +311,7 @@ ParallelBSCAlgorithm::colourGraph(){
     
     T[0]->forkPoint = 0;
     T[0]->holdingFopt = maxInt;
-    T[0]->prevColor   = 0;
-    T[0]->start       = 0;
+    T[0]->prevColor = 0;
 
     // Insert thread resources
     for (int i = 1; i < threadcount_; i++)
@@ -354,17 +350,16 @@ ParallelBSCAlgorithm::colourGraph(void* c){
     heap = T[t]->heap;
     Fopt = T[t]->Fopt;
     colours = T[t]->colours;
- 
+    start = forkPoint;
     // main loop
     // Try tocolour vertice at forkPoint and beyond
-    size -= forkPoint; // only worry about colouring at the fork point and beyond
-    //cout << "T" << t << " starting " <<  " fork at " << forkPoint << endl; 
-    while(start >= 0) {
+    //size -= forkPoint; // only worry about colouring at the fork point and beyond
+    //while(start >= 0) {
+    while(start >= forkPoint) {
 
       back = BACK_GOOD;
-      beforeRollBack = start;
+      //cout << "T" << t << " restarting at " << start << endl;
 
-    //cout << "T" << t << " starting " <<  " fork at " << start     << endl; 
       // Keep colouring until you can't
       for (int i = start; i < size; i++) {
 
@@ -379,64 +374,49 @@ ParallelBSCAlgorithm::colourGraph(void* c){
            else
               c = T[t]->prevColor;
 
-           // The color in the set must be less than optColorNumber
-           // or just 1 more of the best colouring of the previous one
            if (optColorNumber - 1 > 0)
               c = min(c,optColorNumber - 1);
 
            // Find the node with the maximum degree of saturation
-           //cout << "T" << t << "Merging " << endl;
            root = mergeHeap(heap, T[t]->pendingUpdates);
            popHeap(heap, root, T[t]->pendingUpdates);
-
+           //cout << "T" << t << ": pendingUpdates: " << T[t]->pendingUpdates.size() << endl;
            // Find the set of free colour for that node
            A[i].U.clear();
            findFreeColour(root,c,A[i].U,colours);
 
          }
 
-    // if (t > 2)  
-    // { cout << "T" << t << ": I" << i << ": V" << root << ": C" << optColorNumber << ": ";
-    //  for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
-    //      cout << " " << (*it);
-    //  cout << endl; }
-        
+    //  if (t > 2)  
+     //  { cout << "T" << t << ": I" << i << ": V" << root << ": C" << optColorNumber << ": ";
+    //    for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
+            //cout << " " << (*it);
+        //cout << endl; }
+
          // Listen to parent threads for signals
-         if (t > 0) {  // only if you are not the master thread
+         if (t > 0 ) {  // only if you are not the master thread
            if (p2c[t]->s == PC_KILL) {
                back = BACK_KILL; break;
            } else if (p2c[t]->s == PC_PAUSE ) {
                back = BACK_KILL; break;
-           }  else if (p2c[t]->OptColorFound < optColorNumber) {
+           } else if (p2c[t]->OptColorFound <= optColorNumber) {
                optColorNumber = p2c[t]->OptColorFound;
 
                // Rollback if the parent found a better colour already
                if (c >= optColorNumber) {
                  back = BACK_ROLLBACK;
-                 //cout << "Thread " << t << " Rolled back due to parent sig" << endl;
+                 ////cout << "Thread " << t << " Rolled back due to sig" << endl;
                  break;
                }
            }
          }
 
          // Watch for children threads
-         for (list<pair<int, int> >::iterator it = T[t]->spawn.begin();
-             it != T[t]->spawn.end(); it++) {
+         //while (!T[t]->spawn.empty()) {
 
-             int child = (*it).first;
-
-             if (c2p[child]->OptColorFound < optColorNumber) {
-               optColorNumber = c2p[child]->OptColorFound;
-
-               // Rollback if a child found a better colour already
-               if (c >= optColorNumber) {
-                 back = BACK_ROLLBACK;
-                 //cout << "Thread " << t << " Rolled back due to child sig" << endl;
-                 break;
-               }
-             }
-
-         }
+         //    pair<int, int> p = T[t]->spawn.front();
+         //    int child = p.first;
+         //}
 
          // Check if the set is empty or not
          if (A[i].U.size() > 0){// && *A[i].U.begin() < optColorNumber) {
@@ -466,9 +446,7 @@ ParallelBSCAlgorithm::colourGraph(void* c){
              A[i].colors = max(c,T[t]->prevColor);
 
            // Update the heap
-         //  cout << "T" << t << "Updating " << i << endl;
            update(A[i].x, T[t]->pendingUpdates, A[i].undo, heap, colours);
-         //  cout << "T" << t << "Updating OK!" << endl;
          } else {
            // Exit for loop if failed
            start = i-1;
@@ -499,17 +477,19 @@ ParallelBSCAlgorithm::colourGraph(void* c){
 
        case BACK_GOOD:
         // Copy the colouring over
-        for (int i = 0; i < g_->getSize(); i++)
-           Fopt[i] = colours[i];
+        for (int i = 0; i < g_->getSize(); i++) {
+           //cout << "T" << t << ": V" << i << ": Colour:" << colours[i] << endl;
+           Fopt[i] = colours[i]; 
+        }
 
         optColorNumber = A[size-1].colors;
         T[t]->holdingFopt = optColorNumber;
         c2p[t]->OptColorFound = optColorNumber;
 
        // Good carries on to roll back!!
-        //cout << "T" << t << " found good colour " << optColorNumber << endl;
+        ////cout << "T" << t << " found good colour " << optColorNumber << endl;
        case BACK_ROLLBACK:
-        //cout << "T" << t << " is rolling back" << endl;
+        ////cout << "T" << t << " is rolling back" << endl;
         // Notify your children about the better colour
         for (list<pair<int, int> >::iterator it = T[t]->spawn.begin();
              it != T[t]->spawn.end(); it++) {
@@ -518,32 +498,27 @@ ParallelBSCAlgorithm::colourGraph(void* c){
 
         // Look for where to restart and remove unused colours of the freeColor set
         {
-        for (start = 0; A[start].colors < optColorNumber && start <= beforeRollBack; start++) {
-               //cout << "T" << t << " erasing U " << start << endl;
+        for (start = forkPoint; A[start].colors < optColorNumber && start <= beforeRollBack; start++) {
+               ////cout << "T" << t << " erasing U " << start << endl;
            for (set<unsigned int>::reverse_iterator it = A[start].U.rbegin();
                 it != A[start].U.rend() && *it >= optColorNumber; it = A[start].U.rbegin()) {
                     A[start].U.erase(*it);
             }
-        }
-         }
+        } }
         start--;
-        if (start < 0) {
+        if (start < forkPoint) {
            goto LOOP_END;
            break;      // optimal is found!
         }
 
         // revert changes
-          //cout << "T" << t << " reverting to " << start << endl; 
         for (int i = beforeRollBack; i >= start; i--) {
-          //cout << "T" << t << " reverting  " << i << endl; 
           colours[A[i].x] = 0;
           if (heap[A[i].x].parent == notInQueue) {
-          //cout << "T" << t << " adding V" << A[i].x << endl; 
              heap[A[i].x].parent = maxInt;
              T[t]->pendingUpdates.push_back(A[i].x);
           }
           revert(heap,A[i].undo,T[t]->pendingUpdates);
- 
         }
         colours[start] = 0;
         root = start;
@@ -554,7 +529,7 @@ ParallelBSCAlgorithm::colourGraph(void* c){
         break;
  
        default:
-        cout << "I shouldn't be here " << endl;
+        ////cout << "I shouldn't be here " << endl;
         break;
 
       }
@@ -563,7 +538,7 @@ ParallelBSCAlgorithm::colourGraph(void* c){
     }
 
     LOOP_END:
-    //cout << "Thread " << t << " completed" << endl;
+    ////cout << "Thread " << t << " completed" << endl;
     // Wait for spawned threads
     while (!T[t]->spawn.empty()) {
 
@@ -573,30 +548,24 @@ ParallelBSCAlgorithm::colourGraph(void* c){
        T[t]->spawn.pop_front();
 
        // Release children threads resources
-     //  cout << "Thread " << t << " is Waiting for Thread " << childThread << " to join" << endl;
+       //cout << "Thread " << t << " is Waiting for Thread " << childThread << " to join" << endl;
        pthread_join(*threads[childThread], &tmp);
        T[t]->threadPool.push_back(childThread);
        T[t]->threadPool.splice(T[t]->threadPool.end(),T[childThread]->threadPool);
-      // cout << "Thread " << childThread << " joined" << endl;
-     //  cout << "Return " << tmp << endl;
-
-       if (c2p[childThread]->s == CP_RETURNED )
-          //cout << "Thread " << childThread << " is CP_RETURNED " << endl;
-
-       //cout << (unsigned long)tmp << " " << optColorNumber << " " << T[t]->holdingFopt << endl;
+       //cout << "Thread " << childThread << " joined" << endl;
+       //cout << "Return " << tmp << endl;
 
        // Keep the best results if the child is returned, not killed
-     //  if (   c2p[childThread]->s == CP_RETURNED //&& (unsigned long)tmp != maxInt
-     //     && (unsigned long)tmp < optColorNumber) {
-          if (T[childThread]->holdingFopt < T[t]->holdingFopt) {
-     //  cout << "Thread " << childThread << " is better than " << endl;
-          optColorNumber = (unsigned int)tmp;
-            T[t]->holdingFopt = T[childThread]->holdingFopt; 
-            unsigned int* f = T[t]->Fopt;
-            T[t]->Fopt = T[childThread]->Fopt;
-            T[childThread]->Fopt = f;
-          }
-     //  }
+       //if (   c2p[childThread]->s == CP_RETURNED
+       //   && (unsigned long)tmp < c2p[t]->OptColorFound) {
+       if (T[childThread]->holdingFopt < T[t]->holdingFopt ) {
+       //cout << "Taking " << childThread << " results" << endl;
+          optColorNumber = T[childThread]->holdingFopt;
+          T[t]->holdingFopt = T[childThread]->holdingFopt;
+          unsigned int* f = T[t]->Fopt;
+          T[t]->Fopt = T[childThread]->Fopt;
+          T[childThread]->Fopt = f;
+       }
 
     }
 
