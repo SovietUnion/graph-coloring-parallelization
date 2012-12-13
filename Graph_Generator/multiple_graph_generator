@@ -1,0 +1,9 @@
+#!/bin/bash
+for j in 1
+do
+  for i in {1..10}
+  do
+    ./graph_generator 60 0.$j > "Node60D"$j"0/Node60D"$j"0G$i"
+    sleep 1
+  done
+done
