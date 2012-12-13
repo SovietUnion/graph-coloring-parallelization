@@ -544,7 +544,7 @@ ParallelBSCAlgorithm::colourGraph(void* c){
           }
           revert(heap,A[i].undo,T[t]->pendingUpdates);
         }
-        colours[start] = 0;
+        colours[A[start].x] = 0;
         root = A[start].x;
         break;
 
