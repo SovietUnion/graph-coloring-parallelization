@@ -323,7 +323,7 @@ BSCAlgorithm::colourGraph(){
            break;      // optimal is found!
 
         // revert changes
-        for (int i = size-1; i >= start; i--) {
+        for (int i = size-1; i > start; i--) {
           colours[A[i].x] = 0;
           if (heap[A[i].x].parent == notInQueue) {
              heap[A[i].x].parent = maxInt;
@@ -332,6 +332,7 @@ BSCAlgorithm::colourGraph(){
           revert(heap,A[i].undo,pendingUpdates);
         }
         root = A[start].x;
+        colours[root] = 0;
       }
 
     }
