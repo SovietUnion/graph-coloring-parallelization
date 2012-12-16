@@ -1,0 +1,50 @@
+Colouring Node60D90G1
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	2163.949504 ms
+Number of colours used: 26
+PASS
+Colouring Node60D90G10
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	20699.754596 ms
+Number of colours used: 26
+PASS
+Colouring Node60D90G2
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	635.951790 ms
+Number of colours used: 27
+PASS
+Colouring Node60D90G3
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	20631.304222 ms
+Number of colours used: 26
+PASS
+Colouring Node60D90G4
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	709.910976 ms
+Number of colours used: 25
+PASS
+Colouring Node60D90G5
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	305.578509 ms
+Number of colours used: 26
+PASS
+Colouring Node60D90G6
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	3576.338973 ms
+Number of colours used: 25
+PASS
+Colouring Node60D90G7
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	4684.357796 ms
+Number of colours used: 25
+PASS
+Colouring Node60D90G8
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	335.677267 ms
+Number of colours used: 27
+PASS
+Colouring Node60D90G9
+Colouring graph using "Parallel backtracking algorithm" with 2 thread(s).
+Colouring Time Elapsed:	157.267767 ms
+Number of colours used: 25
+PASS

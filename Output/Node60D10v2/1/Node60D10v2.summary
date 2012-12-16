@@ -1,0 +1,40 @@
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	166.849367 ms
+Number of colours used: 4
+PASS
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	4.104197 ms
+Number of colours used: 4
+PASS
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	5.184815 ms
+Number of colours used: 4
+PASS
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	6.690999 ms
+Number of colours used: 4
+PASS
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	11516.462757 ms
+Number of colours used: 4
+PASS
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	7.527979 ms
+Number of colours used: 4
+PASS
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	11.285054 ms
+Number of colours used: 4
+PASS
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	37073.719414 ms
+Number of colours used: 4
+PASS
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	4.546435 ms
+Number of colours used: 4
+PASS
+Colouring graph using "Parallel backtracking algorithm" with 1 thread(s).
+Colouring Time Elapsed:	6.267124 ms
+Number of colours used: 4
+PASS
