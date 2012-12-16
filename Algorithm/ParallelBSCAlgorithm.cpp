@@ -406,10 +406,10 @@ ParallelBSCAlgorithm::colourGraph(void* c){
          }
 
     //  if (t > 2)  
-     //  { cout << "T" << t << ": I" << i << ": V" << root << ": C" << optColorNumber << ": ";
-     //   for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
-     //       cout << " " << (*it);
-     //   cout << endl; }
+       { cout << "T" << t << ": I" << i << ": V" << root << ": C" << optColorNumber << ": ";
+        for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
+            cout << " " << (*it);
+        cout << endl; }
 
          // Listen to parent threads for signals
          if (t > 0 ) {  // only if you are not the master thread
@@ -509,6 +509,8 @@ ParallelBSCAlgorithm::colourGraph(void* c){
         T[t]->holdingFopt = optColorNumber;
         c2p[t]->OptColorFound = optColorNumber;
 
+        cout << "Found good colouring " <<  optColorNumber << endl;
+
        // Good carries on to roll back!!
         ////cout << "T" << t << " found good colour " << optColorNumber << endl;
        case BACK_ROLLBACK:
@@ -522,7 +524,7 @@ ParallelBSCAlgorithm::colourGraph(void* c){
         // Look for where to restart and remove unused colours of the freeColor set
         {
         for (start = forkPoint; A[start].colors < optColorNumber && start <= beforeRollBack; start++) {
-               //cout << "T" << t << " erasing U " << start << endl;
+               cout << "T" << t << " erasing U " << start << " Colours used: " << A[start].colors << endl;
            for (set<unsigned int>::reverse_iterator it = A[start].U.rbegin();
                 it != A[start].U.rend() && *it >= optColorNumber; it = A[start].U.rbegin()) {
                     A[start].U.erase(*it);
@@ -535,7 +537,7 @@ ParallelBSCAlgorithm::colourGraph(void* c){
         }
 
         // revert changes
-        for (int i = beforeRollBack; i >= start; i--) {
+        for (int i = beforeRollBack; i > start; i--) {
           colours[A[i].x] = 0;
           if (heap[A[i].x].parent == notInQueue) {
              //cout << "T" << t << ": adding " << A[i].x << " back" << endl;
