@@ -95,6 +95,8 @@ protected:
 
     // Instance Data
     pthread_t** threads;
+    int GlobalOptColor;
+    pthread_mutex_t GlobalOptColorLock;
     MiscData**  T;
     PtoC**      p2c;
     CtoP**      c2p;

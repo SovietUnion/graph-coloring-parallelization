@@ -37,6 +37,10 @@ ParallelBSCAlgorithm::ParallelBSCAlgorithm(Graph* g, int threadcount) {
        p2c[i] = new PtoC();
        c2p[i] = new CtoP();
     }
+
+    // Golbal Colour initializeation
+    GlobalOptColor = maxInt;
+    pthread_mutex_init(&GlobalOptColorLock,NULL);
 }
 
 
@@ -406,19 +410,22 @@ ParallelBSCAlgorithm::colourGraph(void* c){
          }
 
     //  if (t > 2)  
-       { cout << "T" << t << ": I" << i << ": V" << root << ": C" << optColorNumber << ": ";
-        for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
-            cout << " " << (*it);
-        cout << endl; }
+    //   { cout << "T" << t << ": I" << i << ": V" << root << ": C" << optColorNumber << ": ";
+    //    for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
+    //        cout << " " << (*it);
+    //    cout << endl; }
 
          // Listen to parent threads for signals
-         if (t > 0 ) {  // only if you are not the master thread
-           if (p2c[t]->s == PC_KILL) {
-               back = BACK_KILL; break;
-           } else if (p2c[t]->s == PC_PAUSE ) {
-               back = BACK_KILL; break;
-           } else if (p2c[t]->OptColorFound < optColorNumber) {
-               optColorNumber = p2c[t]->OptColorFound;
+         //if (t > 0 ) {  // only if you are not the master thread
+         //  if (p2c[t]->s == PC_KILL) {
+         //      back = BACK_KILL; break;
+         //  } else if (p2c[t]->s == PC_PAUSE ) {
+         //      back = BACK_KILL; break;
+        //   } else if (p2c[t]->OptColorFound < optColorNumber) {
+        //   } else if (GlobalOptColor < optColorNumber) {
+           if (GlobalOptColor < optColorNumber) {
+        //       optColorNumber = p2c[t]->OptColorFound;
+               optColorNumber = GlobalOptColor;
 
                // Rollback if the parent found a better colour already
                if (c >= optColorNumber) {
@@ -432,7 +439,7 @@ ParallelBSCAlgorithm::colourGraph(void* c){
                  break;
                }
            }
-         }
+         //}
 
          // Watch for children threads
          //while (!T[t]->spawn.empty()) {
@@ -507,9 +514,14 @@ ParallelBSCAlgorithm::colourGraph(void* c){
 
         optColorNumber = A[size-1].colors;
         T[t]->holdingFopt = optColorNumber;
-        c2p[t]->OptColorFound = optColorNumber;
+        //c2p[t]->OptColorFound = optColorNumber;
 
-        cout << "Found good colouring " <<  optColorNumber << endl;
+        pthread_mutex_lock(&GlobalOptColorLock);
+        if (optColorNumber < GlobalOptColor)
+           GlobalOptColor = optColorNumber;
+        pthread_mutex_unlock(&GlobalOptColorLock);
+
+        //cout << "Found good colouring " <<  optColorNumber << endl;
 
        // Good carries on to roll back!!
         ////cout << "T" << t << " found good colour " << optColorNumber << endl;
@@ -524,7 +536,7 @@ ParallelBSCAlgorithm::colourGraph(void* c){
         // Look for where to restart and remove unused colours of the freeColor set
         {
         for (start = forkPoint; A[start].colors < optColorNumber && start <= beforeRollBack; start++) {
-               cout << "T" << t << " erasing U " << start << " Colours used: " << A[start].colors << endl;
+               //cout << "T" << t << " erasing U " << start << " Colours used: " << A[start].colors << endl;
            for (set<unsigned int>::reverse_iterator it = A[start].U.rbegin();
                 it != A[start].U.rend() && *it >= optColorNumber; it = A[start].U.rbegin()) {
                     A[start].U.erase(*it);

@@ -258,10 +258,10 @@ BSCAlgorithm::colourGraph(){
            findFreeColour(root,c,A[i].U);
          }
 
-      //cout << "V" << root << ": C" << optColorNumber << ": ";
-      //for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
-      //    cout << " " << (*it);
-      //cout << endl;
+      cout << "I" << i << ": V" << root << ": C" << optColorNumber << ": ";
+      for (set<unsigned int>::iterator it = A[i].U.begin(); it != A[i].U.end(); it++)
+          cout << " " << (*it);
+      cout << endl;
 
          // Check if the set is empty or not
          if (A[i].U.size() > 0 && *A[i].U.begin() < optColorNumber) {
